@@ -7,12 +7,11 @@ import {
   useState,
 } from "react";
 import { Button, FieldText, Page } from "src/components";
-import { UseForm, useForm } from "src/hooks";
+import { UseForm, useForm, useMount } from "src/hooks";
 import { ChevronDownIcon } from "@heroicons/react/solid";
 import { Api } from "src/api";
 import logo from "src/components/logo.svg";
-
-const api = new Api();
+import { useAuth } from "src/contexts";
 
 const Animate: FunctionComponent = ({ children }) => (
   <Transition
@@ -38,11 +37,12 @@ const SubmitButton = <T extends UseForm<any>>({
   label?: string;
 }) => {
   const [loading, setLoading] = useState(false);
+  const isMounted = useMount();
   const handleSubmit = useCallback(async () => {
     setLoading(true);
     await onSubmit(form.values);
-    setLoading(false);
-  }, [form.values, onSubmit]);
+    if (isMounted.current) setLoading(false);
+  }, [form.values, isMounted, onSubmit]);
   return (
     <Button
       loading={loading}
@@ -54,17 +54,18 @@ const SubmitButton = <T extends UseForm<any>>({
 };
 
 export const LoginPage = () => {
+  const { signIn } = useAuth();
   const form = useForm(
     useMemo(
       () => ({
         email: {
           type: "email",
-          label: "email",
+          label: "Email",
           defaultValue: "",
         },
         password: {
           type: "password",
-          label: "password",
+          label: "Password",
           defaultValue: "",
         },
       }),
@@ -72,19 +73,18 @@ export const LoginPage = () => {
     )
   );
 
+  const handleLogin = useCallback(() => {}, []);
+
   return (
     <Page>
       <div className="flex justify-center items-center h-full">
         <div className="w-96 space-y-4 flex flex-col items-center">
           <img src={logo} alt="logo" className="w-24 h-24" />
+          <span>VinehealthPRO</span>
           <FieldText field={form.fields.email} />
           <FieldText field={form.fields.password} />
           <div className="pt-4 flex w-full">
-            <SubmitButton
-              label="Sign in"
-              form={form}
-              onSubmit={(data) => api.login(data)}
-            />
+            <SubmitButton label="Sign in" form={form} onSubmit={signIn} />
           </div>
         </div>
       </div>

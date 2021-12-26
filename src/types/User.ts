@@ -1,4 +1,4 @@
-interface UserRaw {
+export interface User {
   activityDataEnabled: boolean;
   availableCourses: Record<
     string,
@@ -13,11 +13,11 @@ interface UserRaw {
     cancerType: string;
     diagnosisDate: null;
   }[];
-  dateCreated: string; // Date
-  dateUpdated: string; // Date
-  diagnosisDate: string; // Date
+  dateCreated: Date;
+  dateUpdated: Date;
+  diagnosisDate: Date;
   disableFreeText: boolean;
-  dob: string;
+  dob: Date;
   email: string;
   emailVerified: boolean;
   ethnicity: string;
@@ -48,12 +48,3 @@ interface UserRaw {
   weeklyEmailConsent: boolean;
   weightUnit: string;
 }
-
-export type RawData = {
-  ["/api/v1/auth/login"]: {
-    accessToken: string;
-    refreshToken: string;
-    user: UserRaw;
-    userId: string;
-  };
-};

@@ -3,3 +3,4 @@ export * from "./Sidebar";
 export * from "./Page";
 export * from "./FieldText";
 export * from "./Button";
+export * from "./Logo";
