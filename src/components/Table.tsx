@@ -11,10 +11,10 @@ interface Props<T extends {}> {
 
 export const Table = <T extends {}>({ headers, data, getRowId }: Props<T>) => {
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 overflow-hidden">
       <div className="flex overflow-hidden">
         <div className="align-middle overflow-hidden flex flex-1">
-          <div className="shadow border-b border-gray-200 overflow-y-auto flex flex-1">
+          <div className="shadow border-b border-gray-200 overflow-auto flex flex-1">
             <table className="min-w-full divide-y divide-gray-200 h-fit relative">
               <thead className="bg-gray-50 sticky top-0">
                 <tr className="">
