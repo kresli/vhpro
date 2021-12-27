@@ -1,6 +1,6 @@
 import { Organisation } from "src/types/Organisation";
 import { OrganisationRaw } from "src/types/Organisation.raw";
-import { Program, ProgramRaw, User } from "../types";
+import { Patient, PatientRaw, Program, ProgramRaw, User } from "../types";
 import { UserRaw } from "../types/User.raw";
 
 export const serializeUser = (userRaw: UserRaw): User => ({
@@ -26,4 +26,17 @@ export const serializeProgram = (program: ProgramRaw): Program => ({
   startDate: new Date(program.startDate),
   endDate: program.endDate ? new Date(program.endDate) : null,
   organisation: serializeOrganisation(program.organisation),
+});
+
+export const serializePatient = (patient: PatientRaw): Patient => ({
+  ...patient,
+  dateConsentGiven: new Date(patient.dateConsentGiven),
+  dateConsentRevoked: new Date(patient.dateConsentRevoked),
+  dateCreated: new Date(patient.dateCreated),
+  dateUpdated: new Date(patient.dateUpdated),
+  dob: patient.dob ? new Date(patient.dob) : null,
+  questionnairesEarliestDate: new Date(patient.questionnairesEarliestDate),
+  questionnairesLatestDate: new Date(patient.questionnairesLatestDate),
+  reportsEarliestDate: new Date(patient.reportsEarliestDate),
+  reportsLatestDate: new Date(patient.reportsLatestDate),
 });

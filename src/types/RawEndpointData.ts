@@ -1,3 +1,4 @@
+import { PatientRaw } from ".";
 import { OrganisationRaw } from "./Organisation.raw";
 import { ProgramRaw } from "./Program.raw";
 import { UserRaw } from "./User.raw";
@@ -14,6 +15,8 @@ export type RawEndpointData = {
   ["/admin/organisations/:organisationId"]: OrganisationRaw;
   ["/admin/projects"]: ProgramRaw[];
   ["/admin/projects/:projectId"]: ProgramRaw;
+  ["/admin/projects/:projectId/users"]: PatientRaw[];
+  ["/admin/projects/:projectId/users/:patientId"]: PatientRaw;
   ["/auth/refresh"]: {
     accessToken: string;
     userId: string;

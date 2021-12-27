@@ -6,3 +6,5 @@ export * from "./Button";
 export * from "./Logo";
 export * from "./Table";
 export * from "./Navigation";
+export * from "./ParticipantsTable";
+export * from "./Tabs";

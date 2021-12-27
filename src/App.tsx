@@ -18,6 +18,7 @@ import { OrganisationPage } from "./pages/organisations/[:organisationId]";
 import { memo } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ProgramPage } from "./pages/programs/[:programId]/Program.page";
+import { ParticipantPage } from "./pages/programs/[:programId]/participants/[:participantId]/Participant.page";
 
 const env = new Env({
   apiEndpoint: "https://staging.api.vinehealth.ai/api/v1",
@@ -39,6 +40,11 @@ const Routes = memo(() => {
           component={OrganisationPage}
         />
         <Route exact path="/programs/:programId" component={ProgramPage} />
+        <Route
+          exact
+          path="/programs/:programId/participants/:participantId"
+          component={ParticipantPage}
+        />
         <Route path="*" component={() => <div>404</div>} />
       </Switch>
     </Router>

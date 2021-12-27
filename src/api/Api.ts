@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import {
   serializeOrganisation,
+  serializePatient,
   serializeProgram,
   serializeUser,
 } from "./serializers";
@@ -142,5 +143,45 @@ export class Api {
     return {
       payload,
     };
+  }
+  async getPatients({
+    page = 1,
+    perPage = 25,
+    term = "",
+    consentedOnly = false,
+    programId,
+  }: {
+    page?: number;
+    perPage?: number;
+    term?: string;
+    consentedOnly?: boolean;
+    programId: string;
+  }) {
+    const payload = await this.fetch.get<
+      RawEndpointData["/admin/projects/:projectId/users"]
+    >(`/admin/projects/${programId}/users`, {
+      params: {
+        _page: page,
+        _perPage: perPage,
+        term,
+        consentedOnly,
+      },
+    });
+    return {
+      payload,
+      data: payload.data.map(serializePatient),
+    };
+  }
+  async getPatient({
+    participantId,
+    programId,
+  }: {
+    participantId: string;
+    programId: string;
+  }) {
+    const payload = await this.fetch.get<
+      RawEndpointData["/admin/projects/:projectId/users/:patientId"]
+    >(`admin/projects/${programId}/users/${participantId}`);
+    return { payload, data: serializePatient(payload.data) };
   }
 }

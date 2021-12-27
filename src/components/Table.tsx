@@ -1,3 +1,5 @@
+import { classNames } from "src/utils";
+
 interface Header<T> {
   label: string;
   RowCell: (row: T) => JSX.Element;
@@ -7,9 +9,15 @@ interface Props<T extends {}> {
   headers: Header<T>[];
   data: T[];
   getRowId: (row: T) => string;
+  selectedRowId?: string;
 }
 
-export const Table = <T extends {}>({ headers, data, getRowId }: Props<T>) => {
+export const Table = <T extends {}>({
+  headers,
+  data,
+  getRowId,
+  selectedRowId,
+}: Props<T>) => {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className="flex overflow-hidden">
@@ -33,21 +41,31 @@ export const Table = <T extends {}>({ headers, data, getRowId }: Props<T>) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {data.map((row) => (
-                  <tr key={getRowId(row)} className="hover:bg-slate-100">
-                    {headers.map((header) => {
-                      const { RowCell } = header;
-                      return (
-                        <td
-                          key={header.label}
-                          className="px-6 py-4 whitespace-nowrap"
-                        >
-                          <RowCell {...row} />
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
+                {data.map((row) => {
+                  const key = getRowId(row);
+                  return (
+                    <tr
+                      key={key}
+                      className={classNames(
+                        "hover:bg-slate-100 text-gray-700",
+                        selectedRowId === key &&
+                          "hover:bg-slate-300 bg-slate-300 text-gray-800"
+                      )}
+                    >
+                      {headers.map((header) => {
+                        const { RowCell } = header;
+                        return (
+                          <td
+                            key={header.label}
+                            className="px-6 py-4 whitespace-nowrap"
+                          >
+                            <RowCell {...row} />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

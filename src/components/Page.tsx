@@ -9,6 +9,7 @@ interface Props {
   title?: string;
   loadingContent?: boolean;
   backAction?: { href: string; label: string };
+  sections?: { label: string }[];
 }
 
 export const Page: FunctionComponent<Props> = ({
@@ -17,15 +18,18 @@ export const Page: FunctionComponent<Props> = ({
   title,
   loadingContent,
   backAction,
+  sections,
 }) => {
   const showHeader = !!(title || backAction);
   return (
     <div className="bg-gray-50 w-screen h-screen flex  overflow-hidden flex-col">
-      {navigation && <Navigation />}
+      {navigation && (
+        <Navigation backAction={backAction} title={title} sections={sections} />
+      )}
       {loadingContent && <div>loading content</div>}
       {!loadingContent && (
         <div className="flex flex-col w-full h-full overflow-hidden">
-          {showHeader && (
+          {/* {showHeader && (
             <div className="flex border-b p-4">
               {backAction && (
                 <Link to={backAction.href} className="flex items-center">
@@ -38,7 +42,7 @@ export const Page: FunctionComponent<Props> = ({
                 </div>
               )}
             </div>
-          )}
+          )} */}
           <div className="flex overflow-hidden flex-1 flex-col">{children}</div>
         </div>
       )}
