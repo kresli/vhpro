@@ -1,14 +1,13 @@
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { ParticipantsTable } from "src/components";
-import { Page } from "src/components/Page";
+import { ParticipantsTable, ProgramPage } from "src/components";
 import { useApi } from "src/contexts";
 
-export const ProgramPage = () => {
+export const ParticipantsPage = () => {
   const { programId } = useParams<{ programId: string }>();
   const api = useApi();
   const { data: program } = useQuery(
-    ["program", programId],
+    [programId],
     async () => (await api.getProgram(programId)).data
   );
   const { data: participants } = useQuery(
@@ -16,28 +15,13 @@ export const ProgramPage = () => {
     async () => (await api.getPatients({ programId })).data
   );
   return (
-    <Page
-      navigation
-      title={`${program?.name} program`}
-      loadingContent={!program}
-      backAction={{
-        href: `/organisations/${program?.organisation.organisationId}`,
-        label: `${program?.organisation.name}`,
-      }}
-      sections={[
-        { label: "Participants" },
-        { label: "Reports" },
-        { label: "Questionnaires" },
-        { label: "Team" },
-        { label: "Settings" },
-      ]}
-    >
+    <ProgramPage programId={programId} program={program}>
       <div className="flex flex-row flex-1">
         <ParticipantsTable
           programId={programId}
           participants={participants || []}
         />
       </div>
-    </Page>
+    </ProgramPage>
   );
 };

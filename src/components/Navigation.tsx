@@ -1,12 +1,12 @@
 import { Logo } from ".";
 import { ChevronLeftIcon, UserCircleIcon } from "@heroicons/react/outline";
 import { BellIcon } from "@heroicons/react/outline";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { classNames } from "src/utils";
 interface Props {
   backAction?: { href: string; label: string };
   title?: string;
-  sections?: { label: string }[];
+  sections?: { label: string; link: string }[];
 }
 export function Navigation({ backAction, title, sections }: Props) {
   return (
@@ -45,19 +45,18 @@ export function Navigation({ backAction, title, sections }: Props) {
       {sections && (
         <div className="flex h-16 items-center justify-center border-t border-slate-700">
           <div className="flex space-x-4">
-            {sections.map(({ label }) => (
-              <a
+            {sections.map(({ label, link }) => (
+              <NavLink
                 key={label}
-                href={"/"}
+                to={link}
+                activeClassName="bg-gray-900 text-white"
                 className={classNames(
-                  false
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                  "text-gray-300 hover:bg-gray-700 hover:text-white",
                   "px-3 py-2 rounded-md text-sm font-medium"
                 )}
               >
                 {label}
-              </a>
+              </NavLink>
             ))}
           </div>
         </div>

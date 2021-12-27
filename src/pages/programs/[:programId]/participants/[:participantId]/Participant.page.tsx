@@ -7,13 +7,13 @@ export const ParticipantPage = () => {
   const api = useApi();
   const { programId, participantId } =
     useParams<{ programId: string; participantId: string }>();
-  const { data: participant, isLoading: isLoadingParticipant } = useQuery(
-    [programId, participantId],
-    async () => (await api.getPatient({ participantId, programId })).data
-  );
   const { data: program, isLoading: isLoadingProgram } = useQuery(
     [programId],
     async () => (await api.getProgram(programId)).data
+  );
+  const { data: participant, isLoading: isLoadingParticipant } = useQuery(
+    [programId, participantId],
+    async () => (await api.getPatient({ participantId, programId })).data
   );
   const { data: participants } = useQuery(
     [programId, "patients"],
@@ -21,6 +21,7 @@ export const ParticipantPage = () => {
   );
   const isLoading = isLoadingParticipant || isLoadingProgram;
   console.log(program);
+  const baseURL = `/programs/${programId}`;
   return (
     <Page
       navigation
@@ -31,11 +32,11 @@ export const ParticipantPage = () => {
         label: `${program?.organisation.name}`,
       }}
       sections={[
-        { label: "Participants" },
-        { label: "Reports" },
-        { label: "Questionnaires" },
-        { label: "Team" },
-        { label: "Settings" },
+        { label: "Participants", link: `${baseURL}/participants` },
+        { label: "Reports", link: `${baseURL}/reports` },
+        { label: "Questionnaires", link: `${baseURL}/questionnaires` },
+        { label: "Team", link: `${baseURL}/team` },
+        { label: "Settings", link: `${baseURL}/settings` },
       ]}
     >
       <div className="flex flex-row w-full flex-1">

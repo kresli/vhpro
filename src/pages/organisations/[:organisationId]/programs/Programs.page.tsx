@@ -1,8 +1,7 @@
 import { useQuery } from "react-query";
 import { Link, useParams } from "react-router-dom";
-import { Page, Table, Tabs } from "src/components";
+import { Page, Table } from "src/components";
 import { useApi } from "src/contexts";
-import { Tab } from "@headlessui/react";
 
 const Programs = ({ organisationId }: { organisationId: string }) => {
   const api = useApi();
@@ -76,7 +75,7 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
   );
 };
 
-export const OrganisationPage = () => {
+export const ProgramsPage = () => {
   const api = useApi();
   const { organisationId } = useParams<{ organisationId: string }>();
   const { data: organisation } = useQuery(
@@ -84,13 +83,17 @@ export const OrganisationPage = () => {
     async () => (await api.getOrganisation(organisationId)).data
   );
 
+  const baseURL = `/organisations/${organisationId}`;
+
   return (
     <Page
       navigation
       title={`${organisation?.name} organisation`}
-      loadingContent={!organisation}
       backAction={{ href: "/organisations", label: "Organisations" }}
-      sections={[{ label: "Programs" }, { label: "Settings" }]}
+      sections={[
+        { label: "Programs", link: `${baseURL}/programs` },
+        { label: "Settings", link: `${baseURL}/settings` },
+      ]}
     >
       <Programs organisationId={organisationId} />
     </Page>

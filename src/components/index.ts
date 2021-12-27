@@ -8,3 +8,4 @@ export * from "./Table";
 export * from "./Navigation";
 export * from "./ParticipantsTable";
 export * from "./Tabs";
+export * from "./ProgramPage";

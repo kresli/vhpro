@@ -13,12 +13,15 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import { OrganisationsPage } from "./pages/organisations";
-import { OrganisationPage } from "./pages/organisations/[:organisationId]";
+import { OrganisationsPage } from "./pages/organisations/Organisations.page";
+import { ProgramsPage } from "./pages/organisations/[:organisationId]/programs/Programs.page";
 import { memo } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ProgramPage } from "./pages/programs/[:programId]/Program.page";
 import { ParticipantPage } from "./pages/programs/[:programId]/participants/[:participantId]/Participant.page";
+import { QuestionnairesPage } from "./pages/programs/[:programId]/questionnaires/Questionnaires.page";
+import { ReportsPage } from "./pages/programs/[:programId]/reports/Reports.page";
+import { TeamPage } from "./pages/programs/[:programId]/team/Team.page";
+import { ParticipantsPage } from "./pages/programs/[:programId]/participants/Participants.page";
 
 const env = new Env({
   apiEndpoint: "https://staging.api.vinehealth.ai/api/v1",
@@ -33,13 +36,38 @@ const Routes = memo(() => {
         {!isSigned && <Redirect path="*" to="/login" />}
         <Redirect exact path="/login" to="/" />
         <Redirect exact path="/" to={"/organisations"} />
+        <Redirect
+          exact
+          path="/organisations/:organisationId"
+          to="/organisations/:organisationId/programs"
+        />
         <Route exact path="/organisations" component={OrganisationsPage} />
         <Route
           exact
-          path="/organisations/:organisationId"
-          component={OrganisationPage}
+          path="/organisations/:organisationId/programs"
+          component={ProgramsPage}
         />
-        <Route exact path="/programs/:programId" component={ProgramPage} />
+        <Redirect
+          exact
+          path="/programs/:programId"
+          to="/programs/:programId/participants"
+        />
+        <Route
+          exact
+          path="/programs/:programId/participants"
+          component={ParticipantsPage}
+        />
+        <Route
+          exact
+          path="/programs/:programId/reports"
+          component={ReportsPage}
+        />
+        <Route
+          exact
+          path="/programs/:programId/questionnaires"
+          component={QuestionnairesPage}
+        />
+        <Route exact path="/programs/:programId/team" component={TeamPage} />
         <Route
           exact
           path="/programs/:programId/participants/:participantId"
