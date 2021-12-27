@@ -5,6 +5,7 @@ import { useTokens } from "src/hooks";
 import jwtDecode from "jwt-decode";
 
 const expOffset = 1000 * 60;
+
 export const useApiContext = (env: Env) => {
   const { tokens, updateTokens } = useTokens();
   const api = useMemo(
@@ -28,11 +29,12 @@ export const useApiContext = (env: Env) => {
     );
     return () => clearTimeout(regTimeout);
   }, [api, tokens]);
-  return api;
+  const hasToken = !!tokens.accessToken;
+  return { api, hasToken };
 };
 
-export const ApiContext = createContext<ReturnType<typeof useApiContext>>(
-  null as any
-);
+export type UseApiContext = ReturnType<typeof useApiContext>;
 
-export const useApi = () => useContext(ApiContext);
+export const ApiContext = createContext<UseApiContext>(null as any);
+
+export const useApi = () => useContext(ApiContext).api;

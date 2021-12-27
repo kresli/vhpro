@@ -1,0 +1,58 @@
+interface Header<T> {
+  label: string;
+  RowCell: (row: T) => JSX.Element;
+}
+
+interface Props<T extends {}> {
+  headers: Header<T>[];
+  data: T[];
+  getRowId: (row: T) => string;
+}
+
+export const Table = <T extends {}>({ headers, data, getRowId }: Props<T>) => {
+  return (
+    <div className="flex flex-col flex-1">
+      <div className="flex overflow-hidden">
+        <div className="align-middle overflow-hidden flex flex-1">
+          <div className="shadow border-b border-gray-200 overflow-y-auto flex flex-1">
+            <table className="min-w-full divide-y divide-gray-200 h-fit relative">
+              <thead className="bg-gray-50 sticky top-0">
+                <tr className="">
+                  {headers.map(({ label }) => (
+                    <th
+                      key={label}
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      style={{
+                        boxShadow: "inset 0 -1px 0 rgb(229 231 235)",
+                      }}
+                    >
+                      {label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {data.map((row) => (
+                  <tr key={getRowId(row)} className="hover:bg-slate-100">
+                    {headers.map((header) => {
+                      const { RowCell } = header;
+                      return (
+                        <td
+                          key={header.label}
+                          className="px-6 py-4 whitespace-nowrap"
+                        >
+                          <RowCell {...row} />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

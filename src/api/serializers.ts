@@ -1,6 +1,6 @@
 import { Organisation } from "src/types/Organisation";
 import { OrganisationRaw } from "src/types/Organisation.raw";
-import { User } from "../types";
+import { Program, ProgramRaw, User } from "../types";
 import { UserRaw } from "../types/User.raw";
 
 export const serializeUser = (userRaw: UserRaw): User => ({
@@ -17,4 +17,13 @@ export const serializeOrganisation = (
   ...organisationRaw,
   dateCreated: new Date(organisationRaw.dateCreated),
   dateUpdated: new Date(organisationRaw.dateUpdated),
+});
+
+export const serializeProgram = (program: ProgramRaw): Program => ({
+  ...program,
+  dateCreated: new Date(program.dateCreated),
+  dateUpdated: new Date(program.dateUpdated),
+  startDate: new Date(program.startDate),
+  endDate: program.endDate ? new Date(program.endDate) : null,
+  organisation: serializeOrganisation(program.organisation),
 });

@@ -5,12 +5,11 @@ import {
   useMemo,
   useState,
 } from "react";
-import { Api } from "src/api";
-import jwtDecode from "jwt-decode";
 import { Permission, User } from "src/types";
 import { useMount } from "src/hooks";
+import { UseApiContext } from ".";
 
-export function useAuthContext(api: Api) {
+export function useAuthContext({ api }: UseApiContext) {
   const [user, setUser] = useState<User>();
 
   const fetchUser = useCallback(async () => {

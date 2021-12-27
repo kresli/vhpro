@@ -1,5 +1,9 @@
 import axios, { AxiosInstance } from "axios";
-import { serializeOrganisation, serializeUser } from "./serializers";
+import {
+  serializeOrganisation,
+  serializeProgram,
+  serializeUser,
+} from "./serializers";
 import { RawEndpointData } from "../types/RawEndpointData";
 import { Tokens } from "src/types";
 
@@ -45,6 +49,7 @@ export class Api {
       accessToken: payload.data.accessToken,
       refreshToken: payload.data.refreshToken,
     };
+    this.setTokens(this.tokens);
     return {
       payload,
       data: {
@@ -84,6 +89,45 @@ export class Api {
       }
     );
     return { payload, data: payload.data.map(serializeOrganisation) };
+  }
+  async getOrganisation(organisationId: string) {
+    const payload = await this.fetch.get<
+      RawEndpointData["/admin/organisations/:organisationId"]
+    >(`admin/organisations/${organisationId}`);
+    return { payload, data: serializeOrganisation(payload.data) };
+  }
+  async getPrograms({
+    page = 1,
+    perPage = 25,
+    term = "",
+    organisationId,
+  }: {
+    page?: number;
+    perPage?: number;
+    term?: string;
+    organisationId: string;
+  }) {
+    const payload = await this.fetch.get<RawEndpointData["/admin/projects"]>(
+      "admin/projects",
+      {
+        params: {
+          _page: page,
+          _perPage: perPage,
+          organisationId,
+          term,
+        },
+      }
+    );
+    return {
+      payload,
+      data: payload.data.map(serializeProgram),
+    };
+  }
+  async getProgram(programId: string) {
+    const payload = await this.fetch.get<
+      RawEndpointData["/admin/projects/:projectId"]
+    >(`admin/projects/${programId}`);
+    return { payload, data: serializeProgram(payload.data) };
   }
   async refetchAccessToken() {
     const payload = await axios.post<RawEndpointData["/auth/refresh"]>(
