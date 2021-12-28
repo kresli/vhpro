@@ -21,7 +21,7 @@ import { ParticipantPage } from "./pages/programs/[:programId]/participants/[:pa
 import { QuestionnairesPage } from "./pages/programs/[:programId]/questionnaires/Questionnaires.page";
 import { ReportsPage } from "./pages/programs/[:programId]/reports/Reports.page";
 import { TeamPage } from "./pages/programs/[:programId]/team/Team.page";
-import { ParticipantsPage } from "./pages/programs/[:programId]/participants/Participants.page";
+import { EntrolmentPage } from "./pages/programs/[:programId]/entrolment/Entrolment.page";
 
 const env = new Env({
   apiEndpoint: "https://staging.api.vinehealth.ai/api/v1",
@@ -57,8 +57,8 @@ const Routes = memo(() => {
     ],
     ["/organisations", OrganisationsPage],
     ["/organisations/:organisationId/programs", ProgramsPage],
-    ["/programs/:programId", "/programs/:programId/participants"],
-    ["/programs/:programId/participants", ParticipantsPage],
+    ["/programs/:programId", "/programs/:programId/enrolment"],
+    ["/programs/:programId/enrolment", EntrolmentPage],
     ["/programs/:programId/reports", ReportsPage],
     ["/programs/:programId/questionnaires", QuestionnairesPage],
     ["/programs/:programId/team", TeamPage],

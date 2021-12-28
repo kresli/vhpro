@@ -1,11 +1,9 @@
 import { useHistory } from "react-router-dom";
+import { useForm } from "src/hooks";
 import { Patient } from "src/types";
-import { Table } from ".";
+import { FieldText, Table } from ".";
 
-const STATUSES: Record<string, string> = {
-  CONSENT_GIVEN: "Consented",
-  AWAITING_CONSENT: "Invite sent",
-};
+const displayName = "ParticipantsTable";
 
 export const ParticipantsTable = ({
   participants,
@@ -17,29 +15,39 @@ export const ParticipantsTable = ({
   selectedParticipantId?: string;
 }) => {
   const history = useHistory();
+  const filter = useForm({
+    name: {
+      type: "text",
+      defaultValue: "",
+      placeholder: "search for participant",
+    },
+  });
   return (
-    <Table
-      selectedRowId={selectedParticipantId}
-      onRowClick={({ id }) =>
-        history.push(`/programs/${programId}/participants/${id}`)
-      }
-      headers={[
-        {
-          label: "Patient Name",
-          RowCell: ({ firstName, lastName }) => (
-            <div>
-              {firstName} {lastName}
-            </div>
-          ),
-        },
-        {
-          label: "Status",
-          RowCell: ({ consentStatus }) => <div>{STATUSES[consentStatus]}</div>,
-        },
-      ]}
-      data={participants}
-      getRowId={({ id }) => id}
-      rowAction={(row) => <div>retract</div>}
-    />
+    <div data-testid={displayName} className="flex flex-col overflow-hidden">
+      <div className="p-4 justify-center flex text-gray-400">Participants</div>
+      <div className="pb-4 px-4 border-b border-black/10">
+        <FieldText field={filter.fields.name} />
+      </div>
+      <Table
+        selectedRowId={selectedParticipantId}
+        onRowClick={({ id }) =>
+          history.push(`/programs/${programId}/participants/${id}`)
+        }
+        showHeader={false}
+        headers={[
+          {
+            label: "Patient Name",
+            RowCell: ({ firstName, lastName }) => (
+              <div>
+                {firstName} {lastName}
+              </div>
+            ),
+          },
+        ]}
+        data={participants}
+        getRowId={({ id }) => id}
+      />
+    </div>
   );
 };
+ParticipantsTable.displayName = "ParticipantsTable";

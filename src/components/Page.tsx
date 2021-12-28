@@ -1,7 +1,4 @@
 import { FunctionComponent } from "react";
-
-import { ChevronLeftIcon } from "@heroicons/react/solid";
-import { Link } from "react-router-dom";
 import { Navigation } from ".";
 
 interface Props {
@@ -10,6 +7,8 @@ interface Props {
   backAction?: { href: string; label: string };
   sections?: { label: string; link: string }[];
 }
+
+const displayName = "Page";
 
 export const Page: FunctionComponent<Props> = ({
   navigation,
@@ -30,3 +29,4 @@ export const Page: FunctionComponent<Props> = ({
     </div>
   );
 };
+Page.displayName = displayName;
