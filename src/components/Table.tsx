@@ -9,6 +9,7 @@ interface Props<T extends {}> {
   headers: Header<T>[];
   data: T[];
   getRowId: (row: T) => string;
+  onRowClick?: (row: T) => void;
   selectedRowId?: string;
 }
 
@@ -17,6 +18,7 @@ export const Table = <T extends {}>({
   data,
   getRowId,
   selectedRowId,
+  onRowClick,
 }: Props<T>) => {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
@@ -47,10 +49,12 @@ export const Table = <T extends {}>({
                     <tr
                       key={key}
                       className={classNames(
+                        "cursor-pointer",
                         "hover:bg-slate-100 text-gray-700",
                         selectedRowId === key &&
                           "hover:bg-slate-300 bg-slate-300 text-gray-800"
                       )}
+                      onClick={() => onRowClick?.(row)}
                     >
                       {headers.map((header) => {
                         const { RowCell } = header;

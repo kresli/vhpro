@@ -20,7 +20,11 @@ export function Navigation({ backAction, title, sections }: Props) {
           {backAction && (
             <Link
               to={backAction.href}
-              className="text-gray-400 w-full inline-flex justify-center rounded-md border border-gray-800 shadow-sm px-4 py-2 bg-opacity-20 bg-black text-base font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              className={classNames(
+                "text-gray-300 hover:bg-gray-700 hover:text-primary",
+                "px-3 py-2 font-medium",
+                "text-gray-400 w-full inline-flex justify-center rounded-md border border-gray-800 shadow-sm px-4 py-2 bg-opacity-20 bg-black text-base font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              )}
             >
               <ChevronLeftIcon className="w-4 mr-1" /> {backAction.label}
             </Link>
@@ -49,9 +53,9 @@ export function Navigation({ backAction, title, sections }: Props) {
               <NavLink
                 key={label}
                 to={link}
-                activeClassName="bg-gray-900 text-white"
+                activeClassName="bg-gray-900 text-primary-500"
                 className={classNames(
-                  "text-gray-300 hover:bg-gray-700 hover:text-white",
+                  "text-gray-300 hover:bg-gray-700 hover:text-primary",
                   "px-3 py-2 rounded-md text-sm font-medium"
                 )}
               >

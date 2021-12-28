@@ -1,8 +1,11 @@
-import { useQuery } from "react-query";
-import { Link } from "react-router-dom";
-import { useApi } from "src/contexts";
+import { useHistory } from "react-router-dom";
 import { Patient } from "src/types";
 import { Table } from ".";
+
+const STATUSES: Record<string, string> = {
+  CONSENT_GIVEN: "Consented",
+  AWAITING_CONSENT: "Invite sent",
+};
 
 export const ParticipantsTable = ({
   participants,
@@ -13,29 +16,30 @@ export const ParticipantsTable = ({
   programId: string;
   selectedParticipantId?: string;
 }) => {
-  // const api = useApi();
-  // const { data: patients } = useQuery(
-  //   [programId, "patients"],
-  //   async () => (await api.getPatients({ programId })).data
-  // );
-  // if (!patients) return <div>loading</div>;
+  const history = useHistory();
   return (
-    <div className="w-96 border-r h-full">
-      <Table
-        selectedRowId={selectedParticipantId}
-        headers={[
-          {
-            label: "Patient Name",
-            RowCell: ({ firstName, lastName, id }) => (
-              <Link to={`/programs/${programId}/participants/${id}`}>
-                {firstName} {lastName}
-              </Link>
-            ),
-          },
-        ]}
-        data={participants}
-        getRowId={({ id }) => id}
-      />
-    </div>
+    <Table
+      selectedRowId={selectedParticipantId}
+      onRowClick={({ id }) =>
+        history.push(`/programs/${programId}/participants/${id}`)
+      }
+      headers={[
+        {
+          label: "Patient Name",
+          RowCell: ({ firstName, lastName }) => (
+            <div>
+              {firstName} {lastName}
+            </div>
+          ),
+        },
+        {
+          label: "Status",
+          RowCell: ({ consentStatus }) => <div>{STATUSES[consentStatus]}</div>,
+        },
+      ]}
+      data={participants}
+      getRowId={({ id }) => id}
+      rowAction={(row) => <div>retract</div>}
+    />
   );
 };

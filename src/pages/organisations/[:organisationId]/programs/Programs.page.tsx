@@ -1,10 +1,11 @@
 import { useQuery } from "react-query";
-import { Link, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 import { Page, Table } from "src/components";
 import { useApi } from "src/contexts";
 
 const Programs = ({ organisationId }: { organisationId: string }) => {
   const api = useApi();
+  const history = useHistory();
   const { data: programs } = useQuery(
     ["programs", organisationId],
     async () => (await api.getPrograms({ organisationId })).data
@@ -12,6 +13,7 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
   if (!programs) return <div>loading</div>;
   return (
     <Table
+      onRowClick={({ projectId }) => history.push(`/programs/${projectId}`)}
       headers={[
         {
           label: "Project name",
@@ -26,7 +28,7 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
                   backgroundPosition: "center",
                 }}
               />
-              <Link to={`/programs/${projectId}`}>{name}</Link>
+              <div>{name}</div>
             </div>
           ),
         },

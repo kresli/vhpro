@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Page, Table } from "src/components";
 import { useApi } from "src/contexts";
 import { Organisation } from "src/types";
@@ -7,6 +7,7 @@ import { Organisation } from "src/types";
 export const OrganisationsPage = () => {
   const api = useApi();
   const [organisations, setOrganisations] = useState<Organisation[]>([]);
+  const history = useHistory();
   useEffect(() => {
     const run = async () => {
       const d = await api.getOrganisations({});
@@ -18,12 +19,13 @@ export const OrganisationsPage = () => {
   return (
     <Page navigation title="Organisations">
       <Table
+        onRowClick={({ organisationId }) =>
+          history.push(`/organisations/${organisationId}`)
+        }
         headers={[
           {
             label: "Organisation name",
-            RowCell: ({ name, organisationId }) => (
-              <Link to={`/organisations/${organisationId}`}>{name}</Link>
-            ),
+            RowCell: ({ name }) => <div>{name}</div>,
           },
           {
             label: "created",

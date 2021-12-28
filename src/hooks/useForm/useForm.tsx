@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 interface FieldConfig<T = any> {
-  label: string;
+  label?: string;
   defaultValue: T;
 }
 

@@ -20,12 +20,10 @@ export const ParticipantPage = () => {
     async () => (await api.getPatients({ programId })).data
   );
   const isLoading = isLoadingParticipant || isLoadingProgram;
-  console.log(program);
   const baseURL = `/programs/${programId}`;
   return (
     <Page
       navigation
-      loadingContent={isLoading}
       title={`${program?.name} program`}
       backAction={{
         href: `/organisations/${program?.organisation.organisationId}`,
