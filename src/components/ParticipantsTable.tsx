@@ -24,7 +24,9 @@ export const ParticipantsTable = ({
   });
   return (
     <div data-testid={displayName} className="flex flex-col overflow-hidden">
-      <div className="p-4 justify-center flex text-gray-400">Participants</div>
+      <div className="p-4 justify-center flex text-gray-400">
+        Program participants
+      </div>
       <div className="pb-4 px-4 border-b border-black/10">
         <FieldText field={filter.fields.name} />
       </div>

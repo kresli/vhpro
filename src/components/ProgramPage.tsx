@@ -32,7 +32,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
       ]}
     >
       <div className="flex flex-row flex-1 h-full overflow-hidden">
-        <div className="flex flex-col border-r w-96 bg-slate-200">
+        <div className="flex flex-col w-96 border-r border-slate-400 bg-slate-200">
           <ParticipantsTable
             programId={programId}
             participants={participants}
@@ -43,4 +43,3 @@ export const ProgramPage: FunctionComponent<Props> = ({
     </Page>
   );
 };
-ProgramPage.displayName = "ProgramPage";
