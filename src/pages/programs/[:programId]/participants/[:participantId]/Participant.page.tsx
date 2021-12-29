@@ -2,13 +2,22 @@ import { CalendarIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { ProgramPage } from "src/components";
+import { ProgramPage, Table } from "src/components";
 import { useApi } from "src/contexts";
+
+const data = Array.from({ length: 31 }).map((_, i) => ({ id: i, label: i }));
 
 const VerticalCalendar = () => {
   return (
     <div className="flex overflow-hidden flex-col h-full">
-      <div className="overflow-scroll flex flex-1 h-full">
+      <Table
+        data={data}
+        getRowId={({ id }) => `${id}`}
+        headers={[{ label: "", RowCell: () => <div>row</div> }]}
+        showHeader={false}
+        onPageRequest={(next) => console.log("next")}
+      />
+      {/* <div className="overflow-scroll flex flex-1 h-full">
         <div className="w-full">
           {Array.from({ length: 31 }).map((_, i) => (
             <div
@@ -22,7 +31,7 @@ const VerticalCalendar = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
