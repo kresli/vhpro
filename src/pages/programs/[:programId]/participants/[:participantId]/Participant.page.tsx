@@ -1,11 +1,31 @@
 import { CalendarIcon } from "@heroicons/react/solid";
-import { FunctionComponent, useState } from "react";
+import classNames from "classnames";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { Card, ProgramPage } from "src/components";
+import { ProgramPage } from "src/components";
 import { useApi } from "src/contexts";
-import DatePicker from "react-datepicker";
-import classNames from "classnames";
+
+const VerticalCalendar = () => {
+  return (
+    <div className="flex overflow-hidden flex-col h-full">
+      <div className="overflow-scroll flex flex-1 h-full">
+        <div className="w-full">
+          {Array.from({ length: 31 }).map((_, i) => (
+            <div
+              className={classNames(
+                "border border-gray-600 rounded-md",
+                "justify-center flex flex-1 items-center",
+                "h-12 m-2"
+              )}
+            >
+              {i + 1}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const DateRangePicker = () => {
   return (
@@ -38,67 +58,6 @@ const DateRangePicker = () => {
   );
 };
 
-const Stack: FunctionComponent<{
-  direction?: "row" | "column";
-  justify?:
-    | "center"
-    | "justify-start"
-    | "end"
-    | "center"
-    | "between"
-    | "around"
-    | "evenly"
-    | "items-start"
-    | "items-end"
-    | "items-center"
-    | "items-stretch"
-    | "self-auto"
-    | "self-start"
-    | "self-end"
-    | "self-center"
-    | "self-stretch";
-  overflow?:
-    | "ellipsis"
-    | "auto"
-    | "hidden"
-    | "clip"
-    | "visible"
-    | "scroll"
-    | "x-auto"
-    | "x-hidden"
-    | "x-clip"
-    | "x-visible"
-    | "x-scroll"
-    | "y-auto"
-    | "y-hidden"
-    | "y-clip"
-    | "y-visible"
-    | "y-scroll";
-  width?: number;
-  grow?: boolean;
-}> = ({ children, direction, justify, overflow, width, grow }) => (
-  <div
-    className={classNames("flex", {
-      [`w-${width}`]: width,
-      [`justify-${justify}`]: justify,
-      [`overflow-${overflow}`]: overflow,
-      "flex-row": direction === "row",
-      "flex-col": direction === "column",
-      grow: grow,
-      "grow-0": !grow,
-    })}
-  >
-    {children}
-  </div>
-);
-
-const Header: FunctionComponent<{ name: string }> = ({ name }) => {
-  return (
-    <div className="flex p-4">
-      <div className="text-4xl flex flex-1">{name}</div>
-    </div>
-  );
-};
 export const ParticipantPage = () => {
   const api = useApi();
   const { programId, participantId } =
@@ -122,19 +81,15 @@ export const ParticipantPage = () => {
       program={program}
       selectedParticipantId={participantId}
     >
-      <div className="flex flex-col justify-center outline-hidden">
-        <Header name={`${participant?.firstName} ${participant?.lastName}`} />
-
-        <div className="flex flex-row">
-          <div className="flex w-96 flex-col">
-            <DateRangePicker />
-            <div className="flex overflow-hidden pl-1 flex-col">
-              {Array.from({ length: 31 }).map((_, i) => (
-                <div className="border border-gray-600  justify-center flex flex-1 items-center">
-                  {i + 1}
-                </div>
-              ))}
-            </div>
+      <div className="flex flex-col outline-hidden overflow-hidden w-ful h-full">
+        <div className="flex shrink-0">
+          <div className="text-4xl flex flex-1 border-b border-gray-600">
+            {participant?.firstName} {participant?.lastName}
+          </div>
+        </div>
+        <div className="flex flex-row w-full overflow-hidden h-full">
+          <div className="flex w-60 flex-col border-r border-gray-600 h-full overflow-hidden">
+            <VerticalCalendar />
           </div>
           <div className="flex flex-1">content</div>
         </div>
@@ -142,3 +97,6 @@ export const ParticipantPage = () => {
     </ProgramPage>
   );
 };
+function className(arg0: string, arg1: string): string | undefined {
+  throw new Error("Function not implemented.");
+}
