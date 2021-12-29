@@ -6,6 +6,7 @@ interface Props {
   programId: string;
   program?: Program;
   participants: Patient[];
+  selectedParticipantId?: string;
 }
 
 export const ProgramPage: FunctionComponent<Props> = ({
@@ -13,6 +14,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
   program,
   children,
   participants,
+  selectedParticipantId,
 }) => {
   const baseURL = `/programs/${programId}`;
   const sections = useMemo(
@@ -32,7 +34,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
       sections={sections}
       backAction={{
         href: `/organisations/${program?.organisation.organisationId}`,
-        label: `${program?.organisation.name}`,
+        label: `${program?.organisation.name} organisation`,
       }}
     >
       <div className="flex flex-row flex-1 h-full overflow-hidden">
@@ -40,6 +42,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
           <ParticipantsTable
             programId={programId}
             participants={participants}
+            selectedParticipantId={selectedParticipantId}
           />
         </div>
         <div className="flex flex-col flex-1  w-full h-full overflow-hidden">

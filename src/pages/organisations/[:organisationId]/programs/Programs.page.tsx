@@ -31,26 +31,6 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
   if (!programs) return <div>loading</div>;
   return (
     <Card>
-      <div className="p-4 flex flex-row space-x-4 bg-gray-50 rounded-t-lg">
-        <div className="flex flex-col flex-1 w-full">
-          <div className="relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <SearchIcon className="text-gray-500 w-5" />
-            </div>
-
-            <input
-              type="text"
-              value={""}
-              onChange={({ currentTarget }) => {}}
-              placeholder=""
-              className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 pr-12  border-gray-300 rounded-md"
-            />
-          </div>
-        </div>
-        <div>
-          <Button label="ADD PROGRAM" intent="primary" onClick={() => {}} />
-        </div>
-      </div>
       <Table
         onRowClick={({ projectId }) => history.push(`/programs/${projectId}`)}
         stickyColumn
@@ -148,7 +128,27 @@ export const ProgramsPage = () => {
         { label: "Settings", link: `${baseURL}/settings` },
       ]}
     >
-      <div className="flex flex-1 h-full overflow-hidden px-4 pt-4">
+      <div className="flex flex-1 h-full overflow-hidden px-4 pt-4 flex-col">
+        <div className="mb-4 flex flex-row space-x-4 rounded-t-lg">
+          <div className="flex flex-col flex-1 w-full">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <SearchIcon className="text-gray-500 w-5" />
+              </div>
+
+              <input
+                type="text"
+                value={""}
+                onChange={({ currentTarget }) => {}}
+                placeholder=""
+                className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 pr-12  border-gray-300 rounded-md"
+              />
+            </div>
+          </div>
+          <div>
+            <Button label="ADD PROGRAM" intent="primary" onClick={() => {}} />
+          </div>
+        </div>
         <Programs organisationId={organisationId} />
       </div>
     </Page>
