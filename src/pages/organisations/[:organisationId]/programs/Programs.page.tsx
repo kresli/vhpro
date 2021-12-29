@@ -1,7 +1,25 @@
+import { CheckIcon, SearchIcon } from "@heroicons/react/solid";
+import classNames from "classnames";
+import { FunctionComponent } from "react";
 import { useQuery } from "react-query";
-import { Link, useHistory, useParams } from "react-router-dom";
-import { Page, Table } from "src/components";
+import { useHistory, useParams } from "react-router-dom";
+import { Button, Card, Page, Table } from "src/components";
 import { useApi } from "src/contexts";
+
+const QuestTag: FunctionComponent<{ label: string }> = ({ label }) => {
+  return (
+    <div
+      className={classNames("inline-flex py-1 px-2 text-sm rounded-full", {
+        "bg-red-300": label === "EQ5D",
+        "bg-cyan-300": label === "FACTG",
+        "bg-violet-300": label === "QLQC30",
+        "bg-lime-300": label === "BN20",
+      })}
+    >
+      {label}
+    </div>
+  );
+};
 
 const Programs = ({ organisationId }: { organisationId: string }) => {
   const api = useApi();
@@ -12,68 +30,101 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
   );
   if (!programs) return <div>loading</div>;
   return (
-    <Table
-      onRowClick={({ projectId }) => history.push(`/programs/${projectId}`)}
-      headers={[
-        {
-          label: "Project name",
-          RowCell: ({ name, projectId, imageThumbnailUrl }) => (
-            <div className="flex space-x-4 items-center">
-              <div
-                className="w-14 h-14 border bg-slate-50 rounded-md"
-                style={{
-                  backgroundImage: `url(${imageThumbnailUrl})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center",
-                }}
-              />
-              <div>{name}</div>
+    <Card>
+      <div className="p-4 flex flex-row space-x-4 bg-gray-50 rounded-t-lg">
+        <div className="flex flex-col flex-1 w-full">
+          <div className="relative rounded-md shadow-sm">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <SearchIcon className="text-gray-500 w-5" />
             </div>
-          ),
-        },
-        {
-          label: "Questionnaire types",
-          RowCell: ({ availableQuestionnaireTypes }) => (
-            <div>{availableQuestionnaireTypes.join(", ")}</div>
-          ),
-        },
-        {
-          label: "consented patients",
-          RowCell: ({ consentedPatientsCount }) => (
-            <div>{consentedPatientsCount}</div>
-          ),
-        },
-        {
-          label: "created",
-          RowCell: ({ dateCreated }) => (
-            <div>{dateCreated.toLocaleDateString()}</div>
-          ),
-        },
-        {
-          label: "updated",
-          RowCell: ({ dateUpdated }) => (
-            <div>{dateUpdated.toLocaleDateString()}</div>
-          ),
-        },
-        {
-          label: "end date",
-          RowCell: ({ endDate }) => <div>{endDate?.toLocaleDateString()}</div>,
-        },
-        {
-          label: "free text",
-          RowCell: ({ disableFreeText }) => (
-            <div>{disableFreeText ? "NO" : "YES"}</div>
-          ),
-        },
-        {
-          label: "users",
-          RowCell: ({ usersCount }) => <div>{usersCount}</div>,
-        },
-      ]}
-      data={programs}
-      getRowId={({ projectId }) => projectId}
-    />
+
+            <input
+              type="text"
+              value={""}
+              onChange={({ currentTarget }) => {}}
+              placeholder=""
+              className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 pr-12  border-gray-300 rounded-md"
+            />
+          </div>
+        </div>
+        <div>
+          <Button label="ADD PROGRAM" intent="primary" onClick={() => {}} />
+        </div>
+      </div>
+      <Table
+        onRowClick={({ projectId }) => history.push(`/programs/${projectId}`)}
+        stickyColumn
+        headers={[
+          {
+            label: "Project name",
+            RowCell: ({ name, imageThumbnailUrl }) => (
+              <div className="flex space-x-4 items-center">
+                <div
+                  className="w-14 h-14 border bg-slate-50 rounded-md"
+                  style={{
+                    backgroundImage: `url(${imageThumbnailUrl})`,
+                    backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                  }}
+                />
+                <div>{name}</div>
+              </div>
+            ),
+          },
+          {
+            label: "Questionnaire types",
+            RowCell: ({ availableQuestionnaireTypes }) => (
+              <div className="flex space-x-1">
+                {availableQuestionnaireTypes.map((label) => (
+                  <QuestTag label={label} />
+                ))}
+              </div>
+            ),
+          },
+          {
+            label: "consented patients",
+            RowCell: ({ consentedPatientsCount }) => (
+              <div>{consentedPatientsCount}</div>
+            ),
+          },
+          {
+            label: "created",
+            RowCell: ({ dateCreated }) => (
+              <div>{dateCreated.toLocaleDateString()}</div>
+            ),
+          },
+          {
+            label: "updated",
+            RowCell: ({ dateUpdated }) => (
+              <div>{dateUpdated.toLocaleDateString()}</div>
+            ),
+          },
+          {
+            label: "end date",
+            RowCell: ({ endDate }) => (
+              <div>{endDate?.toLocaleDateString()}</div>
+            ),
+          },
+          {
+            label: "free text",
+            RowCell: ({ disableFreeText }) => (
+              <div>
+                {disableFreeText && (
+                  <CheckIcon className="w-6 text-green-500" />
+                )}
+              </div>
+            ),
+          },
+          {
+            label: "users",
+            RowCell: ({ usersCount }) => <div>{usersCount}</div>,
+          },
+        ]}
+        data={programs}
+        getRowId={({ projectId }) => projectId}
+      />
+    </Card>
   );
 };
 
@@ -97,7 +148,9 @@ export const ProgramsPage = () => {
         { label: "Settings", link: `${baseURL}/settings` },
       ]}
     >
-      <Programs organisationId={organisationId} />
+      <div className="flex flex-1 h-full overflow-hidden px-4 pt-4">
+        <Programs organisationId={organisationId} />
+      </div>
     </Page>
   );
 };

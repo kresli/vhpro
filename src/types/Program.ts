@@ -7,7 +7,7 @@ export interface Program {
   dateCreated: Date;
   dateUpdated: Date;
   description: null | null;
-  disableFreeText: false;
+  disableFreeText: boolean;
   endDate: Date | null; // Date
   identifier: string;
   imageThumbnailUrl: string | null;

@@ -8,8 +8,6 @@ interface Props {
   sections?: { label: string; link: string }[];
 }
 
-const displayName = "Page";
-
 export const Page: FunctionComponent<Props> = ({
   navigation,
   children,
@@ -18,7 +16,7 @@ export const Page: FunctionComponent<Props> = ({
   sections,
 }) => {
   return (
-    <div className="bg-gray-50 w-screen h-screen flex  overflow-hidden flex-col">
+    <div className="bg-gray-200 w-screen h-screen flex  overflow-hidden flex-col">
       {navigation && (
         <Navigation backAction={backAction} title={title} sections={sections} />
       )}
@@ -29,4 +27,3 @@ export const Page: FunctionComponent<Props> = ({
     </div>
   );
 };
-Page.displayName = displayName;

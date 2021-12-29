@@ -13,6 +13,7 @@ interface Props<T extends {}> {
   selectedRowId?: string;
   showHeader?: boolean;
   RowAction?: (row: T) => JSX.Element;
+  stickyColumn?: boolean;
 }
 
 export const Table = <T extends {}>({
@@ -23,13 +24,14 @@ export const Table = <T extends {}>({
   onRowClick,
   showHeader = true,
   RowAction,
+  stickyColumn,
 }: Props<T>) => {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex overflow-hidden">
+      <div className="flex overflow-hidden min-h-full">
         <div className="align-middle overflow-hidden flex flex-1">
           <div className="shadow border-b border-gray-200 overflow-auto flex flex-1">
-            <table className="min-w-full divide-y divide-gray-200 h-fit relative">
+            <table className="min-w-full divide-y divide-gray-200 h-fit relative border-b border-black/10">
               {showHeader && (
                 <thead className="bg-gray-50 sticky top-0 z-30">
                   <tr
@@ -37,11 +39,19 @@ export const Table = <T extends {}>({
                       boxShadow: "inset 0 -1px 0 rgb(229 231 235)",
                     }}
                   >
-                    {headers.map(({ label }) => (
+                    {headers.map(({ label }, i) => (
                       <th
                         key={label}
                         scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        className={classNames(
+                          "whitespace-nowrap",
+                          "px-6 py-3 text-left text-xs font-medium",
+                          "text-gray-500 uppercase tracking-wider",
+                          {
+                            "sticky left-0 z20 bg-gray-50":
+                              stickyColumn && i === 0,
+                          }
+                        )}
                       >
                         {label}
                       </th>
@@ -50,7 +60,7 @@ export const Table = <T extends {}>({
                   </tr>
                 </thead>
               )}
-              <tbody className="divide-y divide-black/10">
+              <tbody className="divide-y divide-black/10 ">
                 {data.map((row) => {
                   const key = getRowId(row);
                   const selected = selectedRowId === key;
@@ -70,12 +80,24 @@ export const Table = <T extends {}>({
                       )}
                       onClick={() => onRowClick?.(row)}
                     >
-                      {headers.map((header) => {
+                      {headers.map((header, i) => {
                         const { RowCell } = header;
                         return (
                           <td
                             key={header.label}
-                            className="px-6 py-4 whitespace-nowrap"
+                            style={{
+                              boxShadow:
+                                stickyColumn && i === 0
+                                  ? "inset -1px 0 0 rgb(229 231 235)"
+                                  : undefined,
+                            }}
+                            className={classNames(
+                              "px-6 py-4 whitespace-nowrap",
+                              {
+                                "sticky left-0 z20 bg-white group-hover:bg-gray-100":
+                                  stickyColumn && i === 0,
+                              }
+                            )}
                           >
                             <RowCell {...row} />
                           </td>

@@ -1,44 +1,19 @@
-import { FunctionComponent } from "react";
 import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
-import {
-  FieldText,
-  ParticipantsTable,
-  ProgramPage,
-  Table,
-} from "src/components";
+import { Button, Card, FieldText, ProgramPage, Table } from "src/components";
 import { useApi } from "src/contexts";
 import { useForm } from "src/hooks";
 import classNames from "classnames";
-const Row: FunctionComponent<{
-  padding?: boolean;
-}> = ({ children, padding }) => <div className="flex ">{children}</div>;
+import {
+  DotsVerticalIcon,
+  PaperAirplaneIcon,
+  SearchIcon,
+} from "@heroicons/react/solid";
+
 enum STATUSES {
   CONSENT_GIVEN = "Consented",
   AWAITING_CONSENT = "Invite sent",
 }
-
-const Button: FunctionComponent<{ intent?: "primary" | "none" }> = ({
-  children,
-  intent = "none",
-}) => (
-  <button
-    type="button"
-    className={classNames(
-      "inline-flex items-center px-4 py-2 border",
-      "border-transparent rounded-md shadow-sm text-sm",
-      "font-medium",
-      "focus:outline-none focus:ring-2 focus:ring-offset-2",
-      {
-        "text-white bg-primary-600 hover:bg-primary-700": intent === "primary",
-        "bg-white border border-gray-300 shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-100":
-          intent === "none",
-      }
-    )}
-  >
-    {children}
-  </button>
-);
 
 export const EntrolmentPage = () => {
   const { programId } = useParams<{ programId: string }>();
@@ -65,16 +40,37 @@ export const EntrolmentPage = () => {
       program={program}
       participants={participants || []}
     >
-      <div className="flex flex-1 h-full overflow-hidden p-4 bg-gray-100">
-        <div className="rounded-lg bg-white flex flex-1 flex-col shadow border-slate-300 border overflow-hidden">
+      <div className="flex flex-1 h-full overflow-hidden px-4 pt-4">
+        <Card>
           <div className="p-4 flex flex-row space-x-4 bg-gray-50 rounded-t-lg">
-            <FieldText field={filter.fields.name} />
-            <Button intent="primary">Invite new patient</Button>
+            <div className="flex flex-col flex-1 w-full">
+              <div className="relative rounded-md shadow-sm">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <SearchIcon className="text-gray-500 w-5" />
+                </div>
+
+                <input
+                  type="text"
+                  value={""}
+                  onChange={({ currentTarget }) => {}}
+                  placeholder=""
+                  className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 pr-12  border-gray-300 rounded-md"
+                />
+              </div>
+            </div>
+            <div>
+              <Button
+                label="INVITE NEW PATIENT"
+                intent="primary"
+                onClick={() => {}}
+              />
+            </div>
           </div>
           <Table
             onRowClick={({ id }) =>
               history.push(`/programs/${programId}/participants/${id}`)
             }
+            stickyColumn
             headers={[
               {
                 label: "Patient Name",
@@ -109,15 +105,39 @@ export const EntrolmentPage = () => {
             ]}
             data={participants || []}
             getRowId={({ id }) => id}
-            RowAction={(row) => (
-              <div className="text-sm mr-4">
-                <Button>
-                  <span className="whitespace-nowrap">Resend invite</span>
-                </Button>
+            RowAction={({ consentGiven }) => (
+              <div className="text-sm mr-4 justify-end flex flex-row">
+                <div
+                  className={classNames(
+                    "inline-flex",
+                    "whitespace-nowrap",
+                    "border rounded-md border-slate-300"
+                  )}
+                >
+                  {!consentGiven && (
+                    <button
+                      onClick={() => {}}
+                      className="bg-gray-100 p-2 hover:bg-gray-200 rounded-l-md flex items-center"
+                    >
+                      <PaperAirplaneIcon className="w-4 mr-1" />
+                      Resend invite
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {}}
+                    className={classNames("p-2 bg-gray-100 hover:bg-gray-200", {
+                      "rounded-r-md": true,
+                      "rounded-l-md": consentGiven,
+                      "border-l": !consentGiven,
+                    })}
+                  >
+                    <DotsVerticalIcon className="w-6" />
+                  </button>
+                </div>
               </div>
             )}
           />
-        </div>
+        </Card>
       </div>
     </ProgramPage>
   );

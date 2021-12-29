@@ -3,8 +3,6 @@ import { useForm } from "src/hooks";
 import { Patient } from "src/types";
 import { FieldText, Table } from ".";
 
-const displayName = "ParticipantsTable";
-
 export const ParticipantsTable = ({
   participants,
   programId,
@@ -23,8 +21,8 @@ export const ParticipantsTable = ({
     },
   });
   return (
-    <div data-testid={displayName} className="flex flex-col overflow-hidden">
-      <div className="p-4 justify-center flex text-gray-400">
+    <div className="flex flex-col overflow-hidden">
+      <div className="h-16 justify-center items-center flex text-gray-400">
         Program participants
       </div>
       <div className="pb-4 px-4 border-b border-black/10">
@@ -52,4 +50,3 @@ export const ParticipantsTable = ({
     </div>
   );
 };
-ParticipantsTable.displayName = "ParticipantsTable";
