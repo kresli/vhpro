@@ -31,7 +31,7 @@ export function Navigation({ backAction, title, sections }: Props) {
             </Link>
           )}
           {title && (
-            <div className="flex mx-8 justify-start items-center text-xl text-gray-400 whitespace-nowrap">
+            <div className="flex mx-8 justify-start items-center text-3xl text-gray-400 whitespace-nowrap">
               {title}
             </div>
           )}

@@ -38,7 +38,7 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
           {
             label: "Project name",
             RowCell: ({ name, imageThumbnailUrl }) => (
-              <div className="flex space-x-4 items-center">
+              <div className="flex space-x-4 items-center px-6 py-4 whitespace-nowrap">
                 <div
                   className="w-14 h-14 border bg-slate-50 rounded-md"
                   style={{
@@ -55,7 +55,7 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
           {
             label: "Questionnaire types",
             RowCell: ({ availableQuestionnaireTypes }) => (
-              <div className="flex space-x-1">
+              <div className="flex space-x-1 px-6 py-4 whitespace-nowrap">
                 {availableQuestionnaireTypes.map((label) => (
                   <QuestTag label={label} />
                 ))}
@@ -65,31 +65,39 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
           {
             label: "consented patients",
             RowCell: ({ consentedPatientsCount }) => (
-              <div>{consentedPatientsCount}</div>
+              <div className="px-6 py-4 whitespace-nowrap">
+                {consentedPatientsCount}
+              </div>
             ),
           },
           {
             label: "created",
             RowCell: ({ dateCreated }) => (
-              <div>{dateCreated.toLocaleDateString()}</div>
+              <div className="px-6 py-4 whitespace-nowrap">
+                {dateCreated.toLocaleDateString()}
+              </div>
             ),
           },
           {
             label: "updated",
             RowCell: ({ dateUpdated }) => (
-              <div>{dateUpdated.toLocaleDateString()}</div>
+              <div className="px-6 py-4 whitespace-nowrap">
+                {dateUpdated.toLocaleDateString()}
+              </div>
             ),
           },
           {
             label: "end date",
             RowCell: ({ endDate }) => (
-              <div>{endDate?.toLocaleDateString()}</div>
+              <div className="px-6 py-4 whitespace-nowrap">
+                {endDate?.toLocaleDateString()}
+              </div>
             ),
           },
           {
             label: "free text",
             RowCell: ({ disableFreeText }) => (
-              <div>
+              <div className="px-6 py-4 whitespace-nowrap">
                 {disableFreeText && (
                   <CheckIcon className="w-6 text-green-500" />
                 )}
@@ -98,7 +106,9 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
           },
           {
             label: "users",
-            RowCell: ({ usersCount }) => <div>{usersCount}</div>,
+            RowCell: ({ usersCount }) => (
+              <div className="px-6 py-4 whitespace-nowrap">{usersCount}</div>
+            ),
           },
         ]}
         data={programs}

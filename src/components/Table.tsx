@@ -91,13 +91,10 @@ export const Table = <T extends {}>({
                                   ? "inset -1px 0 0 rgb(229 231 235)"
                                   : undefined,
                             }}
-                            className={classNames(
-                              "px-6 py-4 whitespace-nowrap",
-                              {
-                                "sticky left-0 z20 bg-white group-hover:bg-gray-100":
-                                  stickyColumn && i === 0,
-                              }
-                            )}
+                            className={classNames("p-0", {
+                              "sticky left-0 z20 bg-white group-hover:bg-gray-100":
+                                stickyColumn && i === 0,
+                            })}
                           >
                             <RowCell {...row} />
                           </td>

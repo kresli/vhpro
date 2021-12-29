@@ -68,7 +68,7 @@ export const EntrolmentPage = () => {
               {
                 label: "Patient Name",
                 RowCell: ({ firstName, lastName }) => (
-                  <div>
+                  <div className="px-6 py-4 whitespace-nowrap">
                     {firstName} {lastName}
                   </div>
                 ),
@@ -76,23 +76,27 @@ export const EntrolmentPage = () => {
               {
                 label: "status",
                 RowCell: ({ consentStatus }) => (
-                  <div
-                    className={classNames(
-                      "inline-flex rounded-full py-1 px-3 text-sm",
-                      {
-                        "bg-green-300": consentStatus === "CONSENT_GIVEN",
-                        "bg-yellow-300": consentStatus === "AWAITING_CONSENT",
-                      }
-                    )}
-                  >
-                    {STATUSES[consentStatus as keyof typeof STATUSES]}
+                  <div className="px-6 py-4 whitespace-nowrap">
+                    <div
+                      className={classNames(
+                        "inline-flex rounded-full py-1 px-3 text-sm",
+                        {
+                          "bg-green-300": consentStatus === "CONSENT_GIVEN",
+                          "bg-yellow-300": consentStatus === "AWAITING_CONSENT",
+                        }
+                      )}
+                    >
+                      {STATUSES[consentStatus as keyof typeof STATUSES]}
+                    </div>
                   </div>
                 ),
               },
               {
                 label: "email",
                 RowCell: ({ email }) => (
-                  <div className="text-gray-500">{email}</div>
+                  <div className="text-gray-500 px-6 py-4 whitespace-nowrap">
+                    {email}
+                  </div>
                 ),
               },
             ]}

@@ -1,4 +1,5 @@
 import { SearchIcon } from "@heroicons/react/solid";
+import { ExclamationCircleIcon } from "@heroicons/react/outline";
 import { useHistory } from "react-router-dom";
 import { Patient } from "src/types";
 import { Table } from ".";
@@ -43,15 +44,19 @@ export const ParticipantsTable = ({
         headers={[
           {
             label: "Patient Name",
-            RowCell: ({ firstName, lastName, severeSymptomsCount }) => (
-              <div className="relative group">
+            RowCell: ({ firstName, lastName, severeSymptomsCount, id }) => (
+              <div className="relative group px-6 py-4 whitespace-nowrap">
+                {selectedParticipantId === id && (
+                  <div className="absolute h-full w-1 bg-primary-500 left-0 top-0" />
+                )}
                 <div>
                   {firstName} {lastName}
                 </div>
                 {!!severeSymptomsCount && (
-                  <div className="absolute h-full  right-0 top-0 flex">
-                    <div className="bg-red-400 flex-inline rounded-full px-4 text-sm flex items-center">
+                  <div className="absolute h-full right-0 top-0 flex items-center pr-4">
+                    <div className="bg-red-400 rounded-full px-2 py-1 text-sm flex items-center h-fit w-fit">
                       <div className="flex whitespace-nowrap space-x-1">
+                        <ExclamationCircleIcon className="w-4" />
                         <span>{severeSymptomsCount}</span>
                         <span className="hidden group-hover:block">
                           SEVERE SYMPTOMPS

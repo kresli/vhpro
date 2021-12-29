@@ -52,21 +52,33 @@ export const OrganisationsPage = () => {
             headers={[
               {
                 label: "Organisation name",
-                RowCell: ({ name }) => <div>{name}</div>,
+                RowCell: ({ name }) => (
+                  <div className="px-6 py-4 whitespace-nowrap">{name}</div>
+                ),
               },
               {
                 label: "created",
                 RowCell: ({ dateCreated }) => (
-                  <div>{dateCreated.toLocaleDateString()}</div>
+                  <div className="px-6 py-4 whitespace-nowrap">
+                    {dateCreated.toLocaleDateString()}
+                  </div>
                 ),
               },
               {
                 label: "projects",
-                RowCell: ({ projectsCount }) => <div>{projectsCount}</div>,
+                RowCell: ({ projectsCount }) => (
+                  <div className="px-6 py-4 whitespace-nowrap">
+                    {projectsCount}
+                  </div>
+                ),
               },
               {
                 label: "users",
-                RowCell: ({ usersCount }) => <div>{usersCount}</div>,
+                RowCell: ({ usersCount }) => (
+                  <div className="px-6 py-4 whitespace-nowrap">
+                    {usersCount}
+                  </div>
+                ),
               },
             ]}
             data={organisations}
