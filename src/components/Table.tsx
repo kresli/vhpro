@@ -11,7 +11,7 @@ const HeaderColumn = ({
 }: {
   isLastItem: boolean;
   isFirstItem: boolean;
-  width: number;
+  width?: number;
   header: Header;
   onResizeStart: () => void;
 }) => {
@@ -59,10 +59,12 @@ const TableHeader = <T extends {}>({
   headers,
   columnsWidth,
   onColumnsWidthChange,
+  RowAction,
 }: {
   headers: Header<T>[];
   columnsWidth: number[];
   onColumnsWidthChange: (columnsWidth: number[]) => void;
+  RowAction?: RowAction<T>;
 }) => {
   const cols = useRef(columnsWidth);
   cols.current = columnsWidth;
@@ -91,12 +93,20 @@ const TableHeader = <T extends {}>({
           <HeaderColumn
             header={header}
             key={header.label}
-            isLastItem={i === headers.length - 1}
+            isLastItem={!RowAction && i === headers.length - 1}
             isFirstItem={i === 0}
             width={columnsWidth[i]}
             onResizeStart={() => handleMouseDown(i)}
           />
         ))}
+        {RowAction && (
+          <HeaderColumn
+            header={{ label: "", RowCell: () => <></> }}
+            isLastItem={true}
+            isFirstItem={false}
+            onResizeStart={() => {}}
+          />
+        )}
       </div>
     </div>
   );
@@ -137,6 +147,8 @@ const Cell = <T extends {}>({
   );
 };
 
+type RowAction<T extends {}> = (row: T) => JSX.Element;
+
 const Row = <T extends {}>({
   row,
   selectedRowId,
@@ -152,7 +164,7 @@ const Row = <T extends {}>({
   onRowClick?: (row: T) => void;
   headers: Header[];
   columnsWidth: number[];
-  RowAction?: (row: T) => JSX.Element;
+  RowAction?: RowAction<T>;
 }) => {
   const selected = selectedRowId === rowId;
   return (
@@ -174,7 +186,7 @@ const Row = <T extends {}>({
     >
       {headers.map((header, i) => {
         const { RowCell } = header;
-        const isLastItem = i === headers.length - 1;
+        const isLastItem = !RowAction && i === headers.length - 1;
         const isFirstItem = i === 0;
         const width = !isLastItem ? columnsWidth[i] : undefined;
         return (
@@ -234,6 +246,7 @@ export const Table = <T extends {}>({
               columnsWidth={columnsWidth}
               headers={headers}
               onColumnsWidthChange={setColumnsWidth}
+              RowAction={RowAction}
             />
           )}
           <div className="divide-y divide-black/10 w-auto">
