@@ -67,6 +67,7 @@ export const EntrolmentPage = () => {
             headers={[
               {
                 label: "Patient Name",
+                stickyColumn: true,
                 RowCell: ({ firstName, lastName }) => (
                   <div className="px-6 py-4 whitespace-nowrap">
                     {firstName} {lastName}

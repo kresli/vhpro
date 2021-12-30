@@ -2,38 +2,20 @@ import { DotsVerticalIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 import { useCallback, useRef, useState } from "react";
 
-interface Header<T = any> {
-  label: string;
-  RowCell: (row: T) => JSX.Element;
-}
-
-interface Props<T extends {}> {
-  headers: Header<T>[];
-  data: T[];
-  getRowId: (row: T) => string;
-  onRowClick?: (row: T) => void;
-  selectedRowId?: string;
-  showHeader?: boolean;
-  RowAction?: (row: T) => JSX.Element;
-  stickyColumn?: boolean;
-  onPageRequest?: (nextPageRequested: boolean) => void;
-}
-
 const HeaderColumn = ({
   isLastItem,
   isFirstItem,
-  stickyColumn,
   width,
-  label,
+  header,
   onResizeStart,
 }: {
   isLastItem: boolean;
   isFirstItem: boolean;
-  stickyColumn?: boolean;
   width: number;
-  label: string;
+  header: Header;
   onResizeStart: () => void;
 }) => {
+  const { label, stickyColumn } = header;
   return (
     <div
       className={classNames("flex", "relative", "border-b border-gray-200", {
@@ -76,12 +58,10 @@ const HeaderColumn = ({
 const TableHeader = <T extends {}>({
   headers,
   columnsWidth,
-  stickyColumn,
   onColumnsWidthChange,
 }: {
   headers: Header<T>[];
   columnsWidth: number[];
-  stickyColumn?: boolean;
   onColumnsWidthChange: (columnsWidth: number[]) => void;
 }) => {
   const cols = useRef(columnsWidth);
@@ -107,14 +87,13 @@ const TableHeader = <T extends {}>({
   return (
     <div className="bg-gray-50 sticky top-0 z-10">
       <div className="flex flex-row">
-        {headers.map(({ label }, i) => (
+        {headers.map((header, i) => (
           <HeaderColumn
-            key={label}
+            header={header}
+            key={header.label}
             isLastItem={i === headers.length - 1}
             isFirstItem={i === 0}
-            stickyColumn={stickyColumn}
             width={columnsWidth[i]}
-            label={label}
             onResizeStart={() => handleMouseDown(i)}
           />
         ))}
@@ -216,6 +195,23 @@ const Row = <T extends {}>({
   );
 };
 
+interface Header<T = any> {
+  label: string;
+  stickyColumn?: boolean;
+  RowCell: (row: T) => JSX.Element;
+}
+
+interface Props<T extends {}> {
+  headers: Header<T>[];
+  data: T[];
+  getRowId: (row: T) => string;
+  onRowClick?: (row: T) => void;
+  selectedRowId?: string;
+  showHeader?: boolean;
+  RowAction?: (row: T) => JSX.Element;
+  onPageRequest?: (nextPageRequested: boolean) => void;
+}
+
 export const Table = <T extends {}>({
   headers,
   data,
@@ -224,7 +220,6 @@ export const Table = <T extends {}>({
   onRowClick,
   showHeader = true,
   RowAction,
-  stickyColumn,
   onPageRequest,
 }: Props<T>) => {
   const [columnsWidth, setColumnsWidth] = useState(() =>
@@ -238,7 +233,6 @@ export const Table = <T extends {}>({
             <TableHeader
               columnsWidth={columnsWidth}
               headers={headers}
-              stickyColumn={stickyColumn}
               onColumnsWidthChange={setColumnsWidth}
             />
           )}
