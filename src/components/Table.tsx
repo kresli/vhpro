@@ -191,6 +191,7 @@ const Row = <T extends {}>({
         const width = !isLastItem ? columnsWidth[i] : undefined;
         return (
           <Cell
+            key={header.label}
             width={width}
             isFirstItem={isFirstItem}
             RowCell={RowCell}
