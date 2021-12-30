@@ -2,7 +2,7 @@ import { DotsVerticalIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 import { useCallback, useRef, useState } from "react";
 
-interface Header<T> {
+interface Header<T = any> {
   label: string;
   RowCell: (row: T) => JSX.Element;
 }
@@ -18,6 +18,60 @@ interface Props<T extends {}> {
   stickyColumn?: boolean;
   onPageRequest?: (nextPageRequested: boolean) => void;
 }
+
+const HeaderColumn = ({
+  isLastItem,
+  isFirstItem,
+  stickyColumn,
+  width,
+  label,
+  onResizeStart,
+}: {
+  isLastItem: boolean;
+  isFirstItem: boolean;
+  stickyColumn?: boolean;
+  width: number;
+  label: string;
+  onResizeStart: () => void;
+}) => {
+  return (
+    <div
+      className={classNames("flex", "relative", "border-b border-gray-200", {
+        "sticky left-0 z-10 bg-gray-50": stickyColumn && isFirstItem,
+        "flex-1": isLastItem,
+      })}
+      style={{
+        width: !isLastItem ? width : undefined,
+        boxShadow: "inset 0 -2px 0 rgb(229 231 235)",
+      }}
+    >
+      <div
+        className={classNames(
+          "w-full",
+          "whitespace-nowrap",
+          "shrink-0",
+          "text-ellipsis",
+          "overflow-hidden",
+          "px-6 py-3 text-left text-xs font-medium",
+          "text-gray-500 uppercase tracking-wider",
+          "bg-gray-50"
+        )}
+      >
+        {label}
+      </div>
+      {!isLastItem && (
+        <DotsVerticalIcon
+          onMouseDown={onResizeStart}
+          className={classNames(
+            "w-4 absolute top-0",
+            "-right-2 h-full text-gray-300 cursor-col-resize",
+            "z-20"
+          )}
+        />
+      )}
+    </div>
+  );
+};
 
 const TableHeader = <T extends {}>({
   headers,
@@ -53,53 +107,111 @@ const TableHeader = <T extends {}>({
   return (
     <div className="bg-gray-50 sticky top-0 z-10">
       <div className="flex flex-row">
-        {headers.map(({ label }, i) => {
-          const isLastItem = i === headers.length - 1;
-          const isFirstItem = i === 0;
-          return (
-            <div
-              className={classNames(
-                "flex",
-                "relative",
-                "border-b border-gray-200",
-                {
-                  "sticky left-0 z-10 bg-gray-50": stickyColumn && isFirstItem,
-                  "flex-1": i === headers.length - 1,
-                }
-              )}
-              style={{
-                width: !isLastItem ? columnsWidth[i] : undefined,
-                boxShadow: "inset 0 -2px 0 rgb(229 231 235)",
-              }}
-            >
-              <div
-                className={classNames(
-                  "w-full",
-                  "whitespace-nowrap",
-                  "shrink-0",
-                  "text-ellipsis",
-                  "overflow-hidden",
-                  "px-6 py-3 text-left text-xs font-medium",
-                  "text-gray-500 uppercase tracking-wider",
-                  "bg-gray-50"
-                )}
-              >
-                {label}
-              </div>
-              {!isLastItem && (
-                <DotsVerticalIcon
-                  onMouseDown={() => handleMouseDown(i)}
-                  className={classNames(
-                    "w-4 absolute top-0",
-                    "-right-2 h-full text-gray-300 cursor-col-resize",
-                    "z-20"
-                  )}
-                />
-              )}
-            </div>
-          );
-        })}
+        {headers.map(({ label }, i) => (
+          <HeaderColumn
+            key={label}
+            isLastItem={i === headers.length - 1}
+            isFirstItem={i === 0}
+            stickyColumn={stickyColumn}
+            width={columnsWidth[i]}
+            label={label}
+            onResizeStart={() => handleMouseDown(i)}
+          />
+        ))}
       </div>
+    </div>
+  );
+};
+
+const Cell = <T extends {}>({
+  row,
+  width,
+  isFirstItem,
+  RowCell,
+}: {
+  width: number | undefined;
+  isFirstItem: boolean;
+  RowCell: (row: T) => JSX.Element;
+  row: T;
+}) => {
+  return (
+    <div
+      style={{
+        width,
+        minWidth: width,
+        maxWidth: width,
+        boxShadow: isFirstItem ? "inset -1px 0 0 rgb(229 231 235)" : undefined,
+      }}
+      className={classNames(
+        "p-0",
+        "shrink-0",
+        "overflow-hidden",
+        "flex",
+        "flex-1",
+        {
+          "sticky left-0 z20 bg-white group-hover:bg-gray-100": isFirstItem,
+        }
+      )}
+    >
+      <RowCell {...row} />
+    </div>
+  );
+};
+
+const Row = <T extends {}>({
+  row,
+  selectedRowId,
+  onRowClick,
+  headers,
+  columnsWidth,
+  RowAction,
+  rowId,
+}: {
+  row: T;
+  rowId: string;
+  selectedRowId?: string;
+  onRowClick?: (row: T) => void;
+  headers: Header[];
+  columnsWidth: number[];
+  RowAction?: (row: T) => JSX.Element;
+}) => {
+  const selected = selectedRowId === rowId;
+  return (
+    <div
+      key={rowId}
+      className={classNames(
+        "flex",
+        "group",
+        "cursor-pointer",
+        "hover:bg-black/5",
+        "text-gray-700",
+        {
+          "hover:bg-slate-300": selected,
+          "bg-slate-300": selected,
+          "text-gray-800": selected,
+        }
+      )}
+      onClick={() => onRowClick?.(row)}
+    >
+      {headers.map((header, i) => {
+        const { RowCell } = header;
+        const isLastItem = i === headers.length - 1;
+        const isFirstItem = i === 0;
+        const width = !isLastItem ? columnsWidth[i] : undefined;
+        return (
+          <Cell
+            width={width}
+            isFirstItem={isFirstItem}
+            RowCell={RowCell}
+            row={row}
+          />
+        );
+      })}
+      {RowAction && (
+        <div className="group-hover:sticky right-0 z20 flex flex-1">
+          <RowAction {...row} />
+        </div>
+      )}
     </div>
   );
 };
@@ -132,61 +244,18 @@ export const Table = <T extends {}>({
           )}
           <div className="divide-y divide-black/10 w-auto">
             {data.map((row) => {
-              const key = getRowId(row);
-              const selected = selectedRowId === key;
+              const id = getRowId(row);
               return (
-                <div
-                  key={key}
-                  className={classNames(
-                    "flex",
-                    "group",
-                    "cursor-pointer",
-                    "hover:bg-black/5",
-                    "text-gray-700",
-                    {
-                      "hover:bg-slate-300": selected,
-                      "bg-slate-300": selected,
-                      "text-gray-800": selected,
-                    }
-                  )}
-                  onClick={() => onRowClick?.(row)}
-                >
-                  {headers.map((header, i) => {
-                    const { RowCell } = header;
-                    const isLastItem = i === headers.length - 1;
-                    const isFirstItem = i === 0;
-                    return (
-                      <div
-                        style={{
-                          width: !isLastItem ? columnsWidth[i] : undefined,
-                          minWidth: !isLastItem ? columnsWidth[i] : undefined,
-                          maxWidth: !isLastItem ? columnsWidth[i] : undefined,
-                          boxShadow: isFirstItem
-                            ? "inset -1px 0 0 rgb(229 231 235)"
-                            : undefined,
-                        }}
-                        className={classNames(
-                          "p-0",
-                          "shrink-0",
-                          "overflow-hidden",
-                          "flex",
-                          "flex-1",
-                          {
-                            "sticky left-0 z20 bg-white group-hover:bg-gray-100":
-                              isFirstItem,
-                          }
-                        )}
-                      >
-                        <RowCell {...row} />
-                      </div>
-                    );
-                  })}
-                  {RowAction && (
-                    <div className="group-hover:sticky right-0 z20 flex flex-1">
-                      <RowAction {...row} />
-                    </div>
-                  )}
-                </div>
+                <Row
+                  key={id}
+                  rowId={id}
+                  row={row}
+                  selectedRowId={selectedRowId}
+                  headers={headers}
+                  columnsWidth={columnsWidth}
+                  RowAction={RowAction}
+                  onRowClick={onRowClick}
+                />
               );
             })}
           </div>
