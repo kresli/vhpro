@@ -1,5 +1,6 @@
+import { DotsVerticalIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
-import { useState } from "react";
+import { FunctionComponent, useCallback, useRef, useState } from "react";
 
 interface Header<T> {
   label: string;
@@ -17,6 +18,91 @@ interface Props<T extends {}> {
   stickyColumn?: boolean;
   onPageRequest?: (nextPageRequested: boolean) => void;
 }
+
+const TableHeader = <T extends {}>({
+  headers,
+  columnsWidth,
+  stickyColumn,
+  onColumnsWidthChange,
+}: {
+  headers: Header<T>[];
+  columnsWidth: number[];
+  stickyColumn?: boolean;
+  onColumnsWidthChange: (columnsWidth: number[]) => void;
+}) => {
+  const cols = useRef(columnsWidth);
+  cols.current = columnsWidth;
+  const handleMouseDown = useCallback(
+    (columnIndex: number) => {
+      const onMouseMove = (ev: MouseEvent) => {
+        ev.stopImmediatePropagation();
+        ev.preventDefault();
+        const columns = [...cols.current];
+        columns[columnIndex] += ev.movementX;
+        onColumnsWidthChange(columns);
+      };
+      const onMouseUp = () => {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+      };
+      window.addEventListener("mouseup", onMouseUp);
+      window.addEventListener("mousemove", onMouseMove);
+    },
+    [onColumnsWidthChange]
+  );
+  return (
+    <div className="bg-gray-50 sticky top-0 z-10">
+      <div className="flex flex-row">
+        {headers.map(({ label }, i) => {
+          const isLastItem = i === headers.length - 1;
+          const isFirstItem = i === 0;
+          return (
+            <div
+              className={classNames(
+                "flex",
+                "relative",
+                "border-b border-gray-200",
+                {
+                  "sticky left-0 z-10 bg-gray-50": stickyColumn && isFirstItem,
+                  "flex-1": i === headers.length - 1,
+                }
+              )}
+              style={{
+                width: !isLastItem ? columnsWidth[i] : undefined,
+                boxShadow: "inset 0 -2px 0 rgb(229 231 235)",
+              }}
+            >
+              <div
+                className={classNames(
+                  "w-full",
+                  "whitespace-nowrap",
+                  "shrink-0",
+                  "text-ellipsis",
+                  "overflow-hidden",
+                  "px-6 py-3 text-left text-xs font-medium",
+                  "text-gray-500 uppercase tracking-wider",
+                  "bg-gray-50"
+                )}
+              >
+                {label}
+              </div>
+              {!isLastItem && (
+                <DotsVerticalIcon
+                  onMouseDown={() => handleMouseDown(i)}
+                  className={classNames(
+                    "w-4 absolute top-0",
+                    "-right-2 h-full text-gray-300 cursor-col-resize",
+                    "z-20"
+                  )}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export const Table = <T extends {}>({
   headers,
@@ -37,32 +123,12 @@ export const Table = <T extends {}>({
       <div className="shadow border-b border-gray-200 overflow-scroll flex flex-1">
         <div className="h-fit relative border-b border-black/10 flex-1">
           {showHeader && (
-            <div className="bg-gray-50 sticky top-0 z-30">
-              <div className="flex flex-row">
-                {headers.map(({ label }, i) => (
-                  <div
-                    key={label}
-                    style={{
-                      width:
-                        i !== headers.length - 1 ? columnsWidth[i] : undefined,
-                      boxShadow: "inset 0 -1px 0 rgb(229 231 235)",
-                    }}
-                    className={classNames(
-                      "whitespace-nowrap",
-                      "shrink-0",
-                      "px-6 py-3 text-left text-xs font-medium",
-                      "text-gray-500 uppercase tracking-wider",
-                      {
-                        "sticky left-0 z20 bg-gray-50": stickyColumn && i === 0,
-                        "flex-1": i === headers.length - 1,
-                      }
-                    )}
-                  >
-                    {label}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <TableHeader
+              columnsWidth={columnsWidth}
+              headers={headers}
+              stickyColumn={stickyColumn}
+              onColumnsWidthChange={setColumnsWidth}
+            />
           )}
           <div className="divide-y divide-black/10 w-auto">
             {data.map((row) => {
@@ -87,29 +153,32 @@ export const Table = <T extends {}>({
                 >
                   {headers.map((header, i) => {
                     const { RowCell } = header;
+                    const isLastItem = i === headers.length - 1;
                     return (
                       <div
                         key={header.label}
                         style={{
-                          width:
-                            i !== headers.length - 1
-                              ? columnsWidth[i]
-                              : undefined,
+                          width: !isLastItem ? columnsWidth[i] : undefined,
                           boxShadow:
                             stickyColumn && i === 0
                               ? "inset -1px 0 0 rgb(229 231 235)"
                               : undefined,
                         }}
-                        className={classNames("p-0", "shrink-0", {
-                          "sticky left-0 z20 bg-white group-hover:bg-gray-100":
-                            stickyColumn && i === 0,
-                        })}
+                        className={classNames(
+                          "p-0",
+                          "shrink-0",
+                          "overflow-hidden",
+                          {
+                            "sticky left-0 z20 bg-white group-hover:bg-gray-100":
+                              stickyColumn && i === 0,
+                          }
+                        )}
                       >
                         <RowCell {...row} />
                       </div>
                     );
                   })}
-                  {false && RowAction && (
+                  {RowAction && (
                     <div
                       key="actions"
                       className="group-hover:sticky right-0 z20"

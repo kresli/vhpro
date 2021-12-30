@@ -9,12 +9,16 @@ import { useApi } from "src/contexts";
 const QuestTag: FunctionComponent<{ label: string }> = ({ label }) => {
   return (
     <div
-      className={classNames("inline-flex py-1 px-2 text-sm rounded-full", {
-        "bg-red-300": label === "EQ5D",
-        "bg-cyan-300": label === "FACTG",
-        "bg-violet-300": label === "QLQC30",
-        "bg-lime-300": label === "BN20",
-      })}
+      className={classNames(
+        "inline-flex py-1 px-2 text-sm rounded-full",
+        "h-fit m-1",
+        {
+          "bg-red-300": label === "EQ5D",
+          "bg-cyan-300": label === "FACTG",
+          "bg-violet-300": label === "QLQC30",
+          "bg-lime-300": label === "BN20",
+        }
+      )}
     >
       {label}
     </div>
@@ -38,9 +42,9 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
           {
             label: "Project name",
             RowCell: ({ name, imageThumbnailUrl }) => (
-              <div className="flex space-x-4 items-center px-6 py-4 whitespace-nowrap">
+              <div className="flex space-x-4 items-center px-6 py-4 whitespace-nowrap overflow-hidden">
                 <div
-                  className="w-14 h-14 border bg-slate-50 rounded-md"
+                  className="w-14 h-14 border bg-slate-50 rounded-md shrink-0"
                   style={{
                     backgroundImage: `url(${imageThumbnailUrl})`,
                     backgroundSize: "contain",
@@ -48,16 +52,16 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
                     backgroundPosition: "center",
                   }}
                 />
-                <div>{name}</div>
+                <div className="text-ellipsis overflow-hidden">{name}</div>
               </div>
             ),
           },
           {
             label: "Questionnaire types",
             RowCell: ({ availableQuestionnaireTypes }) => (
-              <div className="flex space-x-1 px-6 py-4 whitespace-nowrap">
+              <div className="flex flex-wrap h-full items-center p-2">
                 {availableQuestionnaireTypes.map((label) => (
-                  <QuestTag label={label} />
+                  <QuestTag key={label} label={label} />
                 ))}
               </div>
             ),
