@@ -45,7 +45,7 @@ export const ParticipantsTable = ({
           {
             label: "Patient Name",
             RowCell: ({ firstName, lastName, severeSymptomsCount, id }) => (
-              <div className="relative group px-6 py-4 whitespace-nowrap">
+              <div className="relative group px-6 py-4 whitespace-nowrap flex-1 flex">
                 {selectedParticipantId === id && (
                   <div className="absolute h-full w-1 bg-primary-500 left-0 top-0" />
                 )}

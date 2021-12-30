@@ -1,6 +1,6 @@
 import { DotsVerticalIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
-import { FunctionComponent, useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 interface Header<T> {
   label: string;
@@ -154,23 +154,26 @@ export const Table = <T extends {}>({
                   {headers.map((header, i) => {
                     const { RowCell } = header;
                     const isLastItem = i === headers.length - 1;
+                    const isFirstItem = i === 0;
                     return (
                       <div
-                        key={header.label}
                         style={{
                           width: !isLastItem ? columnsWidth[i] : undefined,
-                          boxShadow:
-                            stickyColumn && i === 0
-                              ? "inset -1px 0 0 rgb(229 231 235)"
-                              : undefined,
+                          minWidth: !isLastItem ? columnsWidth[i] : undefined,
+                          maxWidth: !isLastItem ? columnsWidth[i] : undefined,
+                          boxShadow: isFirstItem
+                            ? "inset -1px 0 0 rgb(229 231 235)"
+                            : undefined,
                         }}
                         className={classNames(
                           "p-0",
                           "shrink-0",
                           "overflow-hidden",
+                          "flex",
+                          "flex-1",
                           {
                             "sticky left-0 z20 bg-white group-hover:bg-gray-100":
-                              stickyColumn && i === 0,
+                              isFirstItem,
                           }
                         )}
                       >
@@ -179,10 +182,7 @@ export const Table = <T extends {}>({
                     );
                   })}
                   {RowAction && (
-                    <div
-                      key="actions"
-                      className="group-hover:sticky right-0 z20"
-                    >
+                    <div className="group-hover:sticky right-0 z20 flex flex-1">
                       <RowAction {...row} />
                     </div>
                   )}

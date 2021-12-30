@@ -103,12 +103,13 @@ export const EntrolmentPage = () => {
             data={participants || []}
             getRowId={({ id }) => id}
             RowAction={({ consentGiven }) => (
-              <div className="text-sm mr-4 justify-end flex flex-row">
+              <div className="text-sm mr-4 justify-end flex flex-1 flex-row items-center">
                 <div
                   className={classNames(
                     "inline-flex",
                     "whitespace-nowrap",
-                    "border rounded-md border-slate-300"
+                    "border rounded-md border-slate-300",
+                    "h-fit"
                   )}
                 >
                   {!consentGiven && (
