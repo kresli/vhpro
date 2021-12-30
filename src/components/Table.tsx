@@ -19,7 +19,7 @@ const HeaderColumn = ({
   return (
     <div
       className={classNames("flex", "relative", "border-b border-gray-200", {
-        "sticky left-0 z-10 bg-gray-50": stickyColumn && isFirstItem,
+        "sticky left-0 z-30 bg-gray-50": stickyColumn && isFirstItem,
         "flex-1": isLastItem,
       })}
       style={{
@@ -210,6 +210,7 @@ const Row = <T extends {}>({
 interface Header<T = any> {
   label: string;
   stickyColumn?: boolean;
+  defaultWidth?: number;
   RowCell: (row: T) => JSX.Element;
 }
 
@@ -235,7 +236,7 @@ export const Table = <T extends {}>({
   onPageRequest,
 }: Props<T>) => {
   const [columnsWidth, setColumnsWidth] = useState(() =>
-    Array.from({ length: headers.length }).map(() => 200)
+    headers.map(({ defaultWidth }) => defaultWidth ?? 200)
   );
   return (
     <div className="flex flex-col flex-1 overflow-hidden">

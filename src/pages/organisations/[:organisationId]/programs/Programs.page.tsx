@@ -37,10 +37,11 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
     <Card>
       <Table
         onRowClick={({ projectId }) => history.push(`/programs/${projectId}`)}
-        stickyColumn
         headers={[
           {
             label: "Project name",
+            stickyColumn: true,
+            defaultWidth: 300,
             RowCell: ({ name, imageThumbnailUrl }) => (
               <div className="flex space-x-4 items-center px-6 py-4 whitespace-nowrap overflow-hidden">
                 <div
@@ -58,6 +59,7 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
           },
           {
             label: "Questionnaire types",
+            defaultWidth: 300,
             RowCell: ({ availableQuestionnaireTypes }) => (
               <div className="flex flex-wrap h-full items-center p-2">
                 {availableQuestionnaireTypes.map((label) => (
@@ -69,37 +71,41 @@ const Programs = ({ organisationId }: { organisationId: string }) => {
           {
             label: "consented patients",
             RowCell: ({ consentedPatientsCount }) => (
-              <div className="px-6 py-4 whitespace-nowrap">
+              <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
                 {consentedPatientsCount}
               </div>
             ),
           },
           {
             label: "created",
+            defaultWidth: 150,
             RowCell: ({ dateCreated }) => (
-              <div className="px-6 py-4 whitespace-nowrap">
+              <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
                 {dateCreated.toLocaleDateString()}
               </div>
             ),
           },
           {
             label: "updated",
+            defaultWidth: 150,
             RowCell: ({ dateUpdated }) => (
-              <div className="px-6 py-4 whitespace-nowrap">
+              <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
                 {dateUpdated.toLocaleDateString()}
               </div>
             ),
           },
           {
             label: "end date",
+            defaultWidth: 150,
             RowCell: ({ endDate }) => (
-              <div className="px-6 py-4 whitespace-nowrap">
+              <div className="px-6 py-4 whitespace-nowrap  overflow-hidden text-ellipsis">
                 {endDate?.toLocaleDateString()}
               </div>
             ),
           },
           {
             label: "free text",
+            defaultWidth: 120,
             RowCell: ({ disableFreeText }) => (
               <div className="px-6 py-4 whitespace-nowrap">
                 {disableFreeText && (

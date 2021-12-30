@@ -63,19 +63,19 @@ export const EntrolmentPage = () => {
             onRowClick={({ id }) =>
               history.push(`/programs/${programId}/participants/${id}`)
             }
-            stickyColumn
             headers={[
               {
                 label: "Patient Name",
                 stickyColumn: true,
                 RowCell: ({ firstName, lastName }) => (
-                  <div className="px-6 py-4 whitespace-nowrap">
+                  <div className="px-6 py-4 whitespace-nowrap text-ellipsis overflow-hidden">
                     {firstName} {lastName}
                   </div>
                 ),
               },
               {
                 label: "status",
+                defaultWidth: 150,
                 RowCell: ({ consentStatus }) => (
                   <div className="px-6 py-4 whitespace-nowrap">
                     <div
@@ -94,8 +94,9 @@ export const EntrolmentPage = () => {
               },
               {
                 label: "email",
+                defaultWidth: 300,
                 RowCell: ({ email }) => (
-                  <div className="text-gray-500 px-6 py-4 whitespace-nowrap">
+                  <div className="text-gray-500 px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
                     {email}
                   </div>
                 ),
