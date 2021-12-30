@@ -5,7 +5,10 @@ import { useParams } from "react-router-dom";
 import { ProgramPage, Table } from "src/components";
 import { useApi } from "src/contexts";
 
-const data = Array.from({ length: 31 }).map((_, i) => ({ id: i, label: i }));
+const data = Array.from({ length: 999 }).map((_, i) => ({
+  id: i,
+  label: `${i} row`,
+}));
 
 const VerticalCalendar = () => {
   return (
@@ -13,7 +16,7 @@ const VerticalCalendar = () => {
       <Table
         data={data}
         getRowId={({ id }) => `${id}`}
-        headers={[{ label: "", RowCell: () => <div>row</div> }]}
+        headers={[{ label: "", RowCell: ({ label }) => <div>{label}</div> }]}
         showHeader={false}
         onPageRequest={(next) => console.log("next")}
       />
@@ -34,6 +37,10 @@ const VerticalCalendar = () => {
       </div> */}
     </div>
   );
+};
+
+const HorizontalCalendar = () => {
+  return <div>cal</div>;
 };
 
 const DateRangePicker = () => {
@@ -106,6 +113,3 @@ export const ParticipantPage = () => {
     </ProgramPage>
   );
 };
-function className(arg0: string, arg1: string): string | undefined {
-  throw new Error("Function not implemented.");
-}
