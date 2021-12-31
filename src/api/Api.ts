@@ -89,7 +89,12 @@ export class Api {
         },
       }
     );
-    return { payload, data: payload.data.map(serializeOrganisation) };
+    const organisations = payload.data.map(serializeOrganisation);
+    const totalCount = parseInt(payload.headers["x-total-count"]);
+    return {
+      organisations,
+      totalCount,
+    };
   }
   async getOrganisation(organisationId: string) {
     const payload = await this.fetch.get<

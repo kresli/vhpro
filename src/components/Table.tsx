@@ -12,7 +12,7 @@ const HeaderColumn = ({
   isLastItem: boolean;
   isFirstItem: boolean;
   width?: number;
-  header: Header;
+  header: TableHeader;
   onResizeStart: () => void;
 }) => {
   const { label, stickyColumn } = header;
@@ -61,7 +61,7 @@ const TableHeader = <T extends {}>({
   onColumnsWidthChange,
   RowAction,
 }: {
-  headers: Header<T>[];
+  headers: TableHeader<T>[];
   columnsWidth: number[];
   onColumnsWidthChange: (columnsWidth: number[]) => void;
   RowAction?: RowAction<T>;
@@ -162,7 +162,7 @@ const Row = <T extends {}>({
   rowId: string;
   selectedRowId?: string;
   onRowClick?: (row: T) => void;
-  headers: Header[];
+  headers: TableHeader[];
   columnsWidth: number[];
   RowAction?: RowAction<T>;
 }) => {
@@ -208,7 +208,7 @@ const Row = <T extends {}>({
   );
 };
 
-interface Header<T = any> {
+export interface TableHeader<T = any> {
   label: string;
   stickyColumn?: boolean;
   defaultWidth?: number;
@@ -216,14 +216,13 @@ interface Header<T = any> {
 }
 
 interface Props<T extends {}> {
-  headers: Header<T>[];
+  headers: TableHeader<T>[];
   data: T[];
   getRowId: (row: T) => string;
   onRowClick?: (row: T) => void;
   selectedRowId?: string;
   showHeader?: boolean;
   RowAction?: (row: T) => JSX.Element;
-  onPageRequest?: (nextPageRequested: boolean) => void;
 }
 
 export const Table = <T extends {}>({
@@ -234,7 +233,6 @@ export const Table = <T extends {}>({
   onRowClick,
   showHeader = true,
   RowAction,
-  onPageRequest,
 }: Props<T>) => {
   const [columnsWidth, setColumnsWidth] = useState(() =>
     headers.map(({ defaultWidth }) => defaultWidth ?? 200)

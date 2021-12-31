@@ -1,14 +1,16 @@
 import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
-import { Button, Card, FieldText, ProgramPage, Table } from "src/components";
+import { Button, Card, ProgramPage, Table } from "src/components";
 import { useApi } from "src/contexts";
-import { useForm } from "src/hooks";
 import classNames from "classnames";
 import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
   DotsVerticalIcon,
   PaperAirplaneIcon,
   SearchIcon,
 } from "@heroicons/react/solid";
+import { useState } from "react";
 
 enum STATUSES {
   CONSENT_GIVEN = "Consented",
@@ -19,14 +21,24 @@ export const EntrolmentPage = () => {
   const { programId } = useParams<{ programId: string }>();
   const api = useApi();
   const history = useHistory();
+  const patientsPerPage = 25;
+  const [patientsCurrPage, setPatientsCurrPage] = useState(1);
   const { data: program } = useQuery(
     [programId],
     async () => (await api.getProgram(programId)).data
   );
   const { data: participants } = useQuery(
     [programId, "patients"],
-    async () => (await api.getPatients({ programId })).data
+    async () =>
+      (
+        await api.getPatients({
+          programId,
+          perPage: patientsPerPage,
+          page: patientsCurrPage,
+        })
+      ).data
   );
+  const pageCount = Math.ceil((program?.usersCount || 0) / patientsPerPage);
   return (
     <ProgramPage
       programId={programId}
@@ -137,6 +149,50 @@ export const EntrolmentPage = () => {
               </div>
             )}
           />
+          <Card.Footer>
+            <div className="flex-1 flex items-center justify-between py-2 px-4">
+              <div>
+                <p className="text-sm text-gray-700">
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(patientsCurrPage - 1) * patientsPerPage + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {patientsCurrPage * patientsPerPage}
+                  </span>{" "}
+                  of <span className="font-medium">{program?.usersCount}</span>{" "}
+                  results
+                </p>
+              </div>
+              <div>
+                <nav
+                  className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                  aria-label="Pagination"
+                >
+                  <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span className="sr-only">Previous</span>
+                    <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                  {Array.from({ length: pageCount }).map((_, i) => (
+                    <button
+                      className={classNames(
+                        "z-10 bg-indigo-50 border-indigo-500",
+                        "text-indigo-600 relative inline-flex items-center",
+                        "px-4 py-2 border text-sm font-medium"
+                      )}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                    <span className="sr-only">Next</span>
+                    <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </Card.Footer>
         </Card>
       </div>
     </ProgramPage>
