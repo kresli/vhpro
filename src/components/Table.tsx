@@ -115,11 +115,11 @@ const TableHeader = <T extends {}>({
 const Cell = <T extends {}>({
   row,
   width,
-  isFirstItem,
+  stickyColumn,
   RowCell,
 }: {
   width: number | undefined;
-  isFirstItem: boolean;
+  stickyColumn?: boolean;
   RowCell: (row: T) => JSX.Element;
   row: T;
 }) => {
@@ -129,7 +129,7 @@ const Cell = <T extends {}>({
         width,
         minWidth: width,
         maxWidth: width,
-        boxShadow: isFirstItem ? "inset -1px 0 0 rgb(229 231 235)" : undefined,
+        boxShadow: stickyColumn ? "inset -1px 0 0 rgb(229 231 235)" : undefined,
       }}
       className={classNames(
         "p-0",
@@ -138,7 +138,7 @@ const Cell = <T extends {}>({
         "flex",
         "flex-1",
         {
-          "sticky left-0 z20 bg-white group-hover:bg-gray-100": isFirstItem,
+          "sticky left-0 z20 bg-white group-hover:bg-gray-100": stickyColumn,
         }
       )}
     >
@@ -185,15 +185,14 @@ const Row = <T extends {}>({
       onClick={() => onRowClick?.(row)}
     >
       {headers.map((header, i) => {
-        const { RowCell } = header;
+        const { RowCell, stickyColumn } = header;
         const isLastItem = !RowAction && i === headers.length - 1;
-        const isFirstItem = i === 0;
         const width = !isLastItem ? columnsWidth[i] : undefined;
         return (
           <Cell
             key={header.label}
             width={width}
-            isFirstItem={isFirstItem}
+            stickyColumn={stickyColumn}
             RowCell={RowCell}
             row={row}
           />

@@ -9,3 +9,5 @@ export * from "./ParticipantsTable";
 export * from "./Tabs";
 export * from "./ProgramPage";
 export * from "./Card";
+export * from "./TableCard";
+export * from "./InputSelect";
