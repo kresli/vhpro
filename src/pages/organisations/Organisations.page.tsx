@@ -1,9 +1,10 @@
 import { SearchIcon } from "@heroicons/react/solid";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
-import { Button, Page, TableCard } from "src/components";
+import { Button, Page, TableCard, TableHeader } from "src/components";
 import { useApi } from "src/contexts";
+import { Organisation } from "src/types";
 
 export const OrganisationsPage = () => {
   const api = useApi();
@@ -17,6 +18,43 @@ export const OrganisationsPage = () => {
     organisations: [],
     totalCount: 0,
   };
+  const headers: TableHeader<Organisation>[] = useMemo(
+    () => [
+      {
+        label: "Organisation name",
+        stickyColumn: true,
+        RowCell: ({ name }) => (
+          <div className="px-6 py-4 whitespace-nowrap">{name}</div>
+        ),
+      },
+      {
+        label: "created",
+        RowCell: ({ dateCreated }) => (
+          <div className="px-6 py-4 whitespace-nowrap">
+            {dateCreated.toLocaleDateString()}
+          </div>
+        ),
+      },
+      {
+        label: "projects",
+        RowCell: ({ projectsCount }) => (
+          <div className="px-6 py-4 whitespace-nowrap">{projectsCount}</div>
+        ),
+      },
+      {
+        label: "users",
+        RowCell: ({ usersCount }) => (
+          <div className="px-6 py-4 whitespace-nowrap">{usersCount}</div>
+        ),
+      },
+    ],
+    []
+  );
+  const handleRowClick = useCallback(
+    ({ organisationId }) => history.push(`/organisations/${organisationId}`),
+    [history]
+  );
+  const getRowId = ({ organisationId }: Organisation) => organisationId;
   return (
     <Page navigation title="Organisations">
       <div className="flex flex-1 h-full overflow-hidden px-4 pt-4 flex-col">
@@ -50,42 +88,10 @@ export const OrganisationsPage = () => {
           perPageCount={perPage}
           totalDataCount={totalCount}
           onPerPageCountChange={setPerPage}
-          onRowClick={({ organisationId }) =>
-            history.push(`/organisations/${organisationId}`)
-          }
-          headers={[
-            {
-              label: "Organisation name",
-              stickyColumn: true,
-              RowCell: ({ name }) => (
-                <div className="px-6 py-4 whitespace-nowrap">{name}</div>
-              ),
-            },
-            {
-              label: "created",
-              RowCell: ({ dateCreated }) => (
-                <div className="px-6 py-4 whitespace-nowrap">
-                  {dateCreated.toLocaleDateString()}
-                </div>
-              ),
-            },
-            {
-              label: "projects",
-              RowCell: ({ projectsCount }) => (
-                <div className="px-6 py-4 whitespace-nowrap">
-                  {projectsCount}
-                </div>
-              ),
-            },
-            {
-              label: "users",
-              RowCell: ({ usersCount }) => (
-                <div className="px-6 py-4 whitespace-nowrap">{usersCount}</div>
-              ),
-            },
-          ]}
+          onRowClick={handleRowClick}
+          headers={headers}
           data={organisations}
-          getRowId={({ organisationId }) => organisationId}
+          getRowId={getRowId}
         />
       </div>
     </Page>
