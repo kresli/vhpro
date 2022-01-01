@@ -112,8 +112,6 @@ const Paginator = ({
   );
 };
 
-export function useTableState() {}
-
 export const TableCard = <T extends {}>({
   headers,
   data,

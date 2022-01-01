@@ -1,18 +1,9 @@
 import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
-import {
-  Button,
-  Card,
-  ProgramPage,
-  Table,
-  TableCard,
-  TableHeader,
-} from "src/components";
+import { Button, ProgramPage, TableCard, TableHeader } from "src/components";
 import { useApi } from "src/contexts";
 import classNames from "classnames";
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
   DotsVerticalIcon,
   PaperAirplaneIcon,
   SearchIcon,
@@ -75,7 +66,6 @@ export const EntrolmentPage = () => {
       page,
     })
   );
-  console.log(data);
   const { patients, totalCount } = data || { patients: [], totalCount: 0 };
   const headers: TableHeader<Patient>[] = useMemo(
     () => [
