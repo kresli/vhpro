@@ -74,7 +74,8 @@ export const EntrolmentPage = () => {
         perPage: rowsPerPage,
         page,
         term,
-      })
+      }),
+    { keepPreviousData: true }
   );
   const { patients, totalCount } = data || { patients: [], totalCount: 0 };
   const headers: TableHeader<Patient>[] = useMemo(

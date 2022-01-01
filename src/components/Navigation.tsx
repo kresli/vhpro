@@ -10,46 +10,42 @@ interface Props {
 }
 export function Navigation({ backAction, title, sections }: Props) {
   return (
-    <div className=" bg-gradient-to-r to-gray-800 from-secondary-900 ">
-      <div className="flex items-center justify-between h-20 shrink-0 p-4  flex-1 flex-row">
-        <div className="flex justify-center items-center flex-col">
-          <Logo className="w-8 flex-shrink-0" />
-          <div className="text-primary-400 text-xs">VHPRO</div>
+    <div className="h-32 flex-shrink-0 bg-gradient-to-r to-gray-800 from-secondary-900 flex flex-row">
+      <div className="flex flex-col p-4">
+        <div className="flex flex-row items-center flex-1">
+          <Logo className="w-10 flex-shrink-0" />
+          <span className="text-primary-400 text-xl inline-flex ml-2">
+            VHPRO
+          </span>
         </div>
-        <div className="flex flex-1">
+        <div className="flex">
           {backAction && (
-            <Link
-              to={backAction.href}
-              className={classNames(
-                "whitespace-nowrap",
-                "text-gray-300 hover:bg-gray-700 hover:text-primary",
-                "px-3 py-2 font-medium",
-                "text-gray-400 w-full inline-flex justify-center rounded-md border border-gray-800 shadow-sm px-4 py-2 bg-opacity-20 bg-black text-base font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-              )}
-            >
-              <ChevronLeftIcon className="w-4 mr-1" /> {backAction.label}
-            </Link>
-          )}
-          {title && (
-            <div className="flex mx-8 justify-start items-center text-3xl text-gray-400 whitespace-nowrap">
-              {title}
+            <div>
+              <Link
+                to={backAction.href}
+                className={classNames(
+                  "whitespace-nowrap",
+                  "text-secondary-300 text-sm hover:text-primary",
+                  "border border-black/50",
+                  "bg-secondary-800 hover:bg-secondary-700",
+                  "px-3 py-2",
+                  "w-full inline-flex",
+                  "justify-center rounded-md",
+                  "shadow-sm"
+                )}
+              >
+                <ChevronLeftIcon className="w-4 mr-1" /> {backAction.label}
+              </Link>
             </div>
           )}
         </div>
-        <div className="ml-4 flex items-center">
-          <button
-            type="button"
-            className="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-          >
-            <span className="sr-only">View notifications</span>
-            <BellIcon className="h-6 w-6" aria-hidden="true" />
-          </button>
-          <UserCircleIcon className="w-6 h-6 text-gray-400 ml-3" />
-        </div>
       </div>
-      {sections && (
-        <div className="flex flex-1 ml-8 justify-center text-secondary-200/50">
-          {sections.map(({ label, link }) => (
+      <div className="flex flex-1 flex-col">
+        <div className="justify-center items-center flex flex-1 text-3xl text-gray-300 whitespace-nowrap">
+          {title}
+        </div>
+        <div className="flex justify-center text-secondary-200/50 h-11">
+          {sections?.map(({ label, link }) => (
             <NavLink
               key={label}
               to={link}
@@ -68,7 +64,17 @@ export function Navigation({ backAction, title, sections }: Props) {
             </NavLink>
           ))}
         </div>
-      )}
+      </div>
+      <div className="flex flex-row items-start p-4">
+        <button
+          type="button"
+          className="bg-gray-800 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+        >
+          <span className="sr-only">View notifications</span>
+          <BellIcon className="h-6 w-6" aria-hidden="true" />
+        </button>
+        <UserCircleIcon className="w-6 h-6 text-gray-400 ml-3" />
+      </div>
     </div>
   );
 }

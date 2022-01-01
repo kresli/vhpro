@@ -51,7 +51,8 @@ export const ProgramPage: FunctionComponent<Props> = ({
         perPage: rowsPerPage,
         page,
         term: filterTerm,
-      })
+      }),
+    { keepPreviousData: true }
   );
   const { patients, totalCount } = data || { patients: [], totalCount: 0 };
   const onRowClick = useCallback(
