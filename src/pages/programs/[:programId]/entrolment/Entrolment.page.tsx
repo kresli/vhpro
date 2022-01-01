@@ -114,6 +114,8 @@ export const EntrolmentPage = () => {
     [history, programId]
   );
 
+  const getRowId = useCallback(({ id }: Patient) => id, []);
+
   return (
     <ProgramPage
       programId={programId}
@@ -154,7 +156,7 @@ export const EntrolmentPage = () => {
           onRowClick={onRowClick}
           headers={headers}
           data={patients}
-          getRowId={({ id }) => id}
+          getRowId={getRowId}
           RowAction={RowAction}
         />
       </div>
