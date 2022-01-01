@@ -1,6 +1,12 @@
 import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
-import { Button, ProgramPage, TableCard, TableHeader } from "src/components";
+import {
+  Button,
+  Highlight,
+  ProgramPage,
+  TableCard,
+  TableHeader,
+} from "src/components";
 import { useApi } from "src/contexts";
 import classNames from "classnames";
 import {
@@ -55,16 +61,20 @@ export const EntrolmentPage = () => {
   const history = useHistory();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [term, setTerm] = useState("");
   const { data: program } = useQuery(
     [programId],
     async () => (await api.getProgram(programId)).data
   );
-  const { data } = useQuery([programId, "patients", page, rowsPerPage], () =>
-    api.getPatients({
-      programId,
-      perPage: rowsPerPage,
-      page,
-    })
+  const { data } = useQuery(
+    [programId, "patients", page, rowsPerPage, term],
+    () =>
+      api.getPatients({
+        programId,
+        perPage: rowsPerPage,
+        page,
+        term,
+      })
   );
   const { patients, totalCount } = data || { patients: [], totalCount: 0 };
   const headers: TableHeader<Patient>[] = useMemo(
@@ -74,7 +84,7 @@ export const EntrolmentPage = () => {
         stickyColumn: true,
         RowCell: ({ firstName, lastName }) => (
           <div className="px-6 py-4 whitespace-nowrap text-ellipsis overflow-hidden">
-            {firstName} {lastName}
+            <Highlight text={`${firstName} ${lastName}`} term={term} />
           </div>
         ),
       },
@@ -102,12 +112,12 @@ export const EntrolmentPage = () => {
         defaultWidth: 300,
         RowCell: ({ email }) => (
           <div className="text-gray-500 px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
-            {email}
+            <Highlight text={email} term={term} />
           </div>
         ),
       },
     ],
-    []
+    [term]
   );
   const onRowClick = useCallback(
     ({ id }) => history.push(`/programs/${programId}/participants/${id}`),
@@ -128,9 +138,9 @@ export const EntrolmentPage = () => {
 
               <input
                 type="text"
-                value={""}
-                onChange={({ currentTarget }) => {}}
-                placeholder=""
+                value={term}
+                onChange={({ currentTarget }) => setTerm(currentTarget.value)}
+                placeholder="Search for patient"
                 className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 pr-12  border-gray-300 rounded-md"
               />
             </div>

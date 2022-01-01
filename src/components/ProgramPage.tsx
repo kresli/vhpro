@@ -3,7 +3,14 @@ import { SearchIcon } from "@heroicons/react/solid";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
-import { Card, InputSelect, Page, Paginator, TableCard } from "src/components";
+import {
+  Card,
+  Highlight,
+  InputSelect,
+  Page,
+  Paginator,
+  TableCard,
+} from "src/components";
 import { useApi } from "src/contexts";
 import { Patient, Program } from "src/types";
 import { TableHeader } from "./Table";
@@ -22,6 +29,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
 }) => {
   const baseURL = `/programs/${programId}`;
   const history = useHistory();
+  const [filterTerm, setFilterTerm] = useState("");
   const sections = useMemo(
     () => [
       { label: "Patient enrolment", link: `${baseURL}/enrolment` },
@@ -35,12 +43,15 @@ export const ProgramPage: FunctionComponent<Props> = ({
   const api = useApi();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const { data } = useQuery([programId, "patients", page, rowsPerPage], () =>
-    api.getPatients({
-      programId,
-      perPage: rowsPerPage,
-      page,
-    })
+  const { data } = useQuery(
+    [programId, "patients", page, rowsPerPage, filterTerm],
+    () =>
+      api.getPatients({
+        programId,
+        perPage: rowsPerPage,
+        page,
+        term: filterTerm,
+      })
   );
   const { patients, totalCount } = data || { patients: [], totalCount: 0 };
   const onRowClick = useCallback(
@@ -53,13 +64,16 @@ export const ProgramPage: FunctionComponent<Props> = ({
     () => [
       {
         label: "Patient Name",
-        RowCell: ({ firstName, lastName, severeSymptomsCount, id }) => (
-          <div className="relative group px-6 py-4 whitespace-nowrap flex-1 flex">
+        RowCell: ({ firstName, lastName, severeSymptomsCount, id, email }) => (
+          <div className="relative group px-6 py-4 whitespace-nowrap flex-1 flex flex-col">
             {selectedParticipantId === id && (
               <div className="absolute h-full w-1 bg-primary-500 left-0 top-0" />
             )}
             <div>
-              {firstName} {lastName}
+              <Highlight text={`${firstName} ${lastName}`} term={filterTerm} />
+            </div>
+            <div className="text-gray-400 text-sm">
+              <Highlight text={email} term={filterTerm} />
             </div>
             {!!severeSymptomsCount && (
               <div className="absolute h-full right-0 top-0 flex items-center pr-4">
@@ -78,7 +92,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
         ),
       },
     ],
-    [selectedParticipantId]
+    [filterTerm, selectedParticipantId]
   );
   const handlePerPageCountChange = useCallback((value: number) => {
     setPage(1);
@@ -108,8 +122,10 @@ export const ProgramPage: FunctionComponent<Props> = ({
 
                 <input
                   type="text"
-                  value=""
-                  onChange={({ currentTarget }) => {}}
+                  value={filterTerm}
+                  onChange={({ currentTarget }) => {
+                    setFilterTerm(currentTarget.value);
+                  }}
                   placeholder="search for participant"
                   className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 pr-12  border-gray-300 rounded-md"
                 />

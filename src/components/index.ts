@@ -10,3 +10,4 @@ export * from "./ProgramPage";
 export * from "./Card";
 export * from "./TableCard";
 export * from "./InputSelect";
+export * from "./Highlight";
