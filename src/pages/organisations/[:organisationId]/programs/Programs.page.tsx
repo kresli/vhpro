@@ -1,10 +1,11 @@
 import { CheckIcon, SearchIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
-import { FunctionComponent } from "react";
+import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
-import { Button, Card, Page, Table } from "src/components";
+import { Button, Page, TableCard, TableHeader } from "src/components";
 import { useApi } from "src/contexts";
+import { Program } from "src/types";
 
 const QuestTag: FunctionComponent<{ label: string }> = ({ label }) => {
   return (
@@ -25,109 +26,6 @@ const QuestTag: FunctionComponent<{ label: string }> = ({ label }) => {
   );
 };
 
-const Programs = ({ organisationId }: { organisationId: string }) => {
-  const api = useApi();
-  const history = useHistory();
-  const { data: programs } = useQuery(
-    ["programs", organisationId],
-    async () => (await api.getPrograms({ organisationId })).data
-  );
-  if (!programs) return <div>loading</div>;
-  return (
-    <Card>
-      <Table
-        onRowClick={({ projectId }) => history.push(`/programs/${projectId}`)}
-        headers={[
-          {
-            label: "Project name",
-            stickyColumn: true,
-            defaultWidth: 300,
-            RowCell: ({ name, imageThumbnailUrl }) => (
-              <div className="flex space-x-4 items-center px-6 py-4 whitespace-nowrap overflow-hidden">
-                <div
-                  className="w-14 h-14 border bg-slate-50 rounded-md shrink-0"
-                  style={{
-                    backgroundImage: `url(${imageThumbnailUrl})`,
-                    backgroundSize: "contain",
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                  }}
-                />
-                <div className="text-ellipsis overflow-hidden">{name}</div>
-              </div>
-            ),
-          },
-          {
-            label: "Questionnaire types",
-            defaultWidth: 300,
-            RowCell: ({ availableQuestionnaireTypes }) => (
-              <div className="flex flex-wrap h-full items-center p-2">
-                {availableQuestionnaireTypes.map((label) => (
-                  <QuestTag key={label} label={label} />
-                ))}
-              </div>
-            ),
-          },
-          {
-            label: "consented patients",
-            RowCell: ({ consentedPatientsCount }) => (
-              <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
-                {consentedPatientsCount}
-              </div>
-            ),
-          },
-          {
-            label: "created",
-            defaultWidth: 150,
-            RowCell: ({ dateCreated }) => (
-              <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
-                {dateCreated.toLocaleDateString()}
-              </div>
-            ),
-          },
-          {
-            label: "updated",
-            defaultWidth: 150,
-            RowCell: ({ dateUpdated }) => (
-              <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
-                {dateUpdated.toLocaleDateString()}
-              </div>
-            ),
-          },
-          {
-            label: "end date",
-            defaultWidth: 150,
-            RowCell: ({ endDate }) => (
-              <div className="px-6 py-4 whitespace-nowrap  overflow-hidden text-ellipsis">
-                {endDate?.toLocaleDateString()}
-              </div>
-            ),
-          },
-          {
-            label: "free text",
-            defaultWidth: 120,
-            RowCell: ({ disableFreeText }) => (
-              <div className="px-6 py-4 whitespace-nowrap">
-                {disableFreeText && (
-                  <CheckIcon className="w-6 text-green-500" />
-                )}
-              </div>
-            ),
-          },
-          {
-            label: "users",
-            RowCell: ({ usersCount }) => (
-              <div className="px-6 py-4 whitespace-nowrap">{usersCount}</div>
-            ),
-          },
-        ]}
-        data={programs}
-        getRowId={({ projectId }) => projectId}
-      />
-    </Card>
-  );
-};
-
 export const ProgramsPage = () => {
   const api = useApi();
   const { organisationId } = useParams<{ organisationId: string }>();
@@ -135,9 +33,104 @@ export const ProgramsPage = () => {
     ["organisation", organisationId],
     async () => (await api.getOrganisation(organisationId)).data
   );
-
   const baseURL = `/organisations/${organisationId}`;
-
+  const history = useHistory();
+  const { data } = useQuery(["programs", organisationId], () =>
+    api.getPrograms({ organisationId })
+  );
+  const onRowClick = useCallback(
+    ({ projectId }: Program) => history.push(`/programs/${projectId}`),
+    [history]
+  );
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const headers: TableHeader<Program>[] = useMemo(
+    () => [
+      {
+        label: "Project name",
+        stickyColumn: true,
+        defaultWidth: 300,
+        RowCell: ({ name, imageThumbnailUrl }) => (
+          <div className="flex space-x-4 items-center px-6 py-4 whitespace-nowrap overflow-hidden">
+            <div
+              className="w-14 h-14 border bg-slate-50 rounded-md shrink-0"
+              style={{
+                backgroundImage: `url(${imageThumbnailUrl})`,
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
+              }}
+            />
+            <div className="text-ellipsis overflow-hidden">{name}</div>
+          </div>
+        ),
+      },
+      {
+        label: "Questionnaire types",
+        defaultWidth: 300,
+        RowCell: ({ availableQuestionnaireTypes }) => (
+          <div className="flex flex-wrap h-full items-center p-2">
+            {availableQuestionnaireTypes.map((label) => (
+              <QuestTag key={label} label={label} />
+            ))}
+          </div>
+        ),
+      },
+      {
+        label: "consented patients",
+        RowCell: ({ consentedPatientsCount }) => (
+          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
+            {consentedPatientsCount}
+          </div>
+        ),
+      },
+      {
+        label: "created",
+        defaultWidth: 150,
+        RowCell: ({ dateCreated }) => (
+          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
+            {dateCreated.toLocaleDateString()}
+          </div>
+        ),
+      },
+      {
+        label: "updated",
+        defaultWidth: 150,
+        RowCell: ({ dateUpdated }) => (
+          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
+            {dateUpdated.toLocaleDateString()}
+          </div>
+        ),
+      },
+      {
+        label: "end date",
+        defaultWidth: 150,
+        RowCell: ({ endDate }) => (
+          <div className="px-6 py-4 whitespace-nowrap  overflow-hidden text-ellipsis">
+            {endDate?.toLocaleDateString()}
+          </div>
+        ),
+      },
+      {
+        label: "free text",
+        defaultWidth: 120,
+        RowCell: ({ disableFreeText }) => (
+          <div className="px-6 py-4 whitespace-nowrap">
+            {disableFreeText && <CheckIcon className="w-6 text-green-500" />}
+          </div>
+        ),
+      },
+      {
+        label: "users",
+        RowCell: ({ usersCount }) => (
+          <div className="px-6 py-4 whitespace-nowrap">{usersCount}</div>
+        ),
+      },
+    ],
+    []
+  );
+  const { totalCount, programs } = data || { programs: [], totalCount: 0 };
+  const getRowId = useCallback(({ projectId }) => projectId, []);
   return (
     <Page
       navigation
@@ -169,7 +162,17 @@ export const ProgramsPage = () => {
             <Button label="ADD PROGRAM" intent="primary" onClick={() => {}} />
           </div>
         </div>
-        <Programs organisationId={organisationId} />
+        <TableCard
+          page={page}
+          rowsPerPage={rowsPerPage}
+          totalRows={totalCount}
+          headers={headers}
+          data={programs}
+          getRowId={getRowId}
+          onPageChange={setPage}
+          onRowsPerPageChange={setRowsPerPage}
+          onRowClick={onRowClick}
+        />
       </div>
     </Page>
   );

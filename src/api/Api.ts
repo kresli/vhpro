@@ -124,9 +124,11 @@ export class Api {
         },
       }
     );
+    const totalCount = parseInt(payload.headers["x-total-count"]);
+    const programs = payload.data.map(serializeProgram);
     return {
-      payload,
-      data: payload.data.map(serializeProgram),
+      totalCount,
+      programs,
     };
   }
   async getProgram(programId: string) {
@@ -172,9 +174,10 @@ export class Api {
         consentedOnly,
       },
     });
+    const totalCount = parseInt(payload.headers["x-total-count"]);
     return {
-      payload,
-      data: payload.data.map(serializePatient),
+      totalCount,
+      patients: payload.data.map(serializePatient),
     };
   }
   async getPatient({

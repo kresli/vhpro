@@ -6,13 +6,60 @@ import { Button, Page, TableCard, TableHeader } from "src/components";
 import { useApi } from "src/contexts";
 import { Organisation } from "src/types";
 
+// function useTableState<T>({
+//   page = 1,
+//   rowsPerPage,
+//   onPageRequest,
+// }: {
+//   page?: number;
+//   rowsPerPage: number;
+//   onPageRequest: (payload: {
+//     page: number;
+//     rowsPerPage: number;
+//   }) => Promise<{ totalRows: number; rows: T[] }>;
+// }) {
+//   const [state, setState] = useState({
+//     page,
+//     rowsPerPage,
+//     rows: [] as T[],
+//     totalRows: 0,
+//   });
+
+//   const onPageChange = useCallback(
+//     async (page: number) => {
+//       setState({ ...state, page });
+//       const newState = await onPageRequest({
+//         page,
+//         rowsPerPage: state.rowsPerPage,
+//       });
+//       setState({ ...state, ...newState });
+//     },
+//     [onPageRequest, state]
+//   );
+
+//   const onRowsPerPageChange = useCallback(
+//     async (rowsPerPage: number) => {
+//       setState({ ...state, page });
+//       const newState = await onPageRequest({ page: state.page, rowsPerPage });
+//       setState({ ...state, ...newState });
+//     },
+//     [onPageRequest, page, state]
+//   );
+
+//   return {
+//     ...state,
+//     onPageChange,
+//     onRowsPerPageChange,
+//   };
+// }
+
 export const OrganisationsPage = () => {
   const api = useApi();
   const history = useHistory();
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-  const { data } = useQuery([page, perPage], async () =>
-    api.getOrganisations({ page, perPage })
+  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const { data } = useQuery([page, rowsPerPage], () =>
+    api.getOrganisations({ page, perPage: rowsPerPage })
   );
   const { organisations, totalCount } = data || {
     organisations: [],
@@ -83,14 +130,14 @@ export const OrganisationsPage = () => {
           </div>
         </div>
         <TableCard
-          currentPage={page}
-          onPageChange={setPage}
-          perPageCount={perPage}
-          totalDataCount={totalCount}
-          onPerPageCountChange={setPerPage}
-          onRowClick={handleRowClick}
-          headers={headers}
+          page={page}
           data={organisations}
+          rowsPerPage={rowsPerPage}
+          totalRows={totalCount}
+          headers={headers}
+          onPageChange={setPage}
+          onRowsPerPageChange={setRowsPerPage}
+          onRowClick={handleRowClick}
           getRowId={getRowId}
         />
       </div>

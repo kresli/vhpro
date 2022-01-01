@@ -115,17 +115,17 @@ const Paginator = ({
 export function useTableState() {}
 
 export const TableCard = <T extends {}>({
-  onRowClick,
   headers,
   data,
-  getRowId,
   selectedRowId,
+  page,
+  rowsPerPage,
+  totalRows,
+  getRowId,
+  onRowClick,
   RowAction,
-  currentPage,
   onPageChange,
-  perPageCount,
-  totalDataCount,
-  onPerPageCountChange,
+  onRowsPerPageChange,
 }: {
   headers: TableHeader<T>[];
   data: T[];
@@ -133,19 +133,19 @@ export const TableCard = <T extends {}>({
   onRowClick?: (row: T) => void;
   selectedRowId?: string;
   RowAction?: (row: T) => JSX.Element;
-  currentPage: number;
+  page: number;
   onPageChange: (page: number) => void;
-  perPageCount: number;
-  totalDataCount: number;
-  onPerPageCountChange: (value: number) => void;
+  rowsPerPage: number;
+  totalRows: number;
+  onRowsPerPageChange: (value: number) => void;
 }) => {
-  const pagesCount = Math.ceil(totalDataCount / perPageCount);
+  const pagesCount = Math.ceil(totalRows / rowsPerPage);
   const handlePerPageCountChange = useCallback(
     (value: number) => {
       onPageChange(1);
-      onPerPageCountChange(value);
+      onRowsPerPageChange(value);
     },
-    [onPageChange, onPerPageCountChange]
+    [onPageChange, onRowsPerPageChange]
   );
   return (
     <Card>
@@ -163,13 +163,13 @@ export const TableCard = <T extends {}>({
             <p className="text-sm text-gray-700">
               Showing{" "}
               <span className="font-medium">
-                {(currentPage - 1) * perPageCount + 1}
+                {(page - 1) * rowsPerPage + 1}
               </span>{" "}
               to{" "}
               <span className="font-medium">
-                {Math.min(currentPage * perPageCount, totalDataCount)}
+                {Math.min(page * rowsPerPage, totalRows)}
               </span>{" "}
-              of <span className="font-medium">{totalDataCount}</span> results
+              of <span className="font-medium">{totalRows}</span> results
             </p>
           </div>
           <div className="space-x-4 flex">
@@ -181,12 +181,12 @@ export const TableCard = <T extends {}>({
                 { id: "50", label: "50 rows", value: 50 },
                 { id: "100", label: "100 rows", value: 100 },
               ]}
-              selected={`${perPageCount}`}
+              selected={`${rowsPerPage}`}
               onChange={({ value }) => handlePerPageCountChange(value)}
             />
             <Paginator
               pagesCount={pagesCount}
-              currentPage={currentPage}
+              currentPage={page}
               onPageChange={onPageChange}
             />
           </div>
