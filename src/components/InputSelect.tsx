@@ -1,7 +1,5 @@
-import { Fragment, useCallback, useMemo, useRef, useState } from "react";
-import { Menu, Transition } from "@headlessui/react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ChevronDownIcon } from "@heroicons/react/solid";
-import classNames from "classnames";
 import { usePopper } from "react-popper";
 import { Button } from ".";
 
@@ -71,9 +69,12 @@ export const InputSelect = <T extends any>({
   );
   return (
     <div className="relative">
-      <div ref={setReferenceElement}>
+      <div ref={setReferenceElement} className="h-full">
         <Button onClick={handleClick}>
-          {selectedItem.label} <ChevronDownIcon className="ml-1 w-4" />
+          <div className="flex-nowrap flex">
+            <span className="whitespace-nowrap">{selectedItem.label}</span>{" "}
+            <ChevronDownIcon className="ml-1 w-4" />
+          </div>
         </Button>
       </div>
       {visible && (
@@ -93,7 +94,7 @@ export const InputSelect = <T extends any>({
                   className="p-4 hover:bg-gray-100"
                   onClick={() => handleChange(item)}
                 >
-                  {label}
+                  <span className="whitespace-nowrap">{label}</span>
                 </button>
               );
             })}

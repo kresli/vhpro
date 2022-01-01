@@ -16,7 +16,7 @@ export const Page: FunctionComponent<Props> = ({
   sections,
 }) => {
   return (
-    <div className="bg-gray-200 w-screen h-screen flex  overflow-hidden flex-col">
+    <div className="bg-secondary-600/10 w-screen h-screen flex  overflow-hidden flex-col">
       {navigation && (
         <Navigation backAction={backAction} title={title} sections={sections} />
       )}

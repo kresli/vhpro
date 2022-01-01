@@ -22,7 +22,7 @@ export const Button: FunctionComponent<Props> = ({
       disabled={disabled}
       onClick={onClick}
       className={classNames(
-        "disabled:bg-indigo-300 group relative w-full flex justify-center " +
+        "disabled:bg-secondary-300 group relative w-full flex justify-center " +
           "py-2 px-4 border border-transparent text-sm font-medium rounded-md " +
           "focus:outline-none focus:ring-2 focus:ring-offset-2 " +
           "inline-flex items-center px-4 py-2 border",

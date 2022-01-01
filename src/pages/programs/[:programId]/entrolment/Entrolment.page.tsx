@@ -117,11 +117,7 @@ export const EntrolmentPage = () => {
   const getRowId = useCallback(({ id }: Patient) => id, []);
 
   return (
-    <ProgramPage
-      programId={programId}
-      program={program}
-      participants={patients}
-    >
+    <ProgramPage programId={programId} program={program}>
       <div className="flex flex-1 h-full overflow-hidden px-4 pt-4 flex-col">
         <div className="flex flex-row space-x-4 rounded-t-lg mb-4">
           <div className="flex flex-col flex-1 w-full">

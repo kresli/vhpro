@@ -9,12 +9,13 @@ const PagButton = ({
   onClick,
 }: {
   label: string | number;
-  active: boolean;
-  onClick: () => void;
+  active?: boolean;
+  onClick?: () => void;
 }) => (
   <button
     onClick={onClick}
     className={classNames(
+      "bg-white",
       "z-10",
       "relative inline-flex items-center",
       "px-4 py-2 border text-sm font-medium",
@@ -27,13 +28,15 @@ const PagButton = ({
   </button>
 );
 
-const Paginator = ({
+export const Paginator = ({
   pagesCount,
   currentPage,
   onPageChange,
+  showActivePageOnly,
 }: {
   pagesCount: number;
   currentPage: number;
+  showActivePageOnly?: boolean;
   onPageChange: (page: number) => void;
 }) => {
   // This component implements pagination buttons such as these:
@@ -49,12 +52,15 @@ const Paginator = ({
   const maxButtonsCount = 7;
 
   const buttons = useMemo(() => {
+    if (showActivePageOnly) {
+      return <PagButton label={currentPage} />;
+    }
     if (pagesCount <= maxButtonsCount)
       return Array.from({ length: pagesCount }).map((_, i) => (
         <PagButton
           key={i}
           label={i + 1}
-          active={currentPage === i + 1}
+          active={pagesCount !== 1 && currentPage === i + 1}
           onClick={() => onPageChange(i + 1)}
         />
       ));
@@ -83,7 +89,7 @@ const Paginator = ({
         }}
       />
     ));
-  }, [currentPage, onPageChange, pagesCount]);
+  }, [currentPage, onPageChange, pagesCount, showActivePageOnly]);
   return (
     <div>
       <nav
@@ -95,7 +101,6 @@ const Paginator = ({
           className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           onClick={() => onPageChange(currentPage - 1)}
         >
-          <span className="sr-only">Previous</span>
           <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
         </button>
         {buttons}
@@ -104,7 +109,6 @@ const Paginator = ({
           className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           onClick={() => onPageChange(currentPage + 1)}
         >
-          <span className="sr-only">Next</span>
           <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
         </button>
       </nav>
@@ -124,6 +128,8 @@ export const TableCard = <T extends {}>({
   RowAction,
   onPageChange,
   onRowsPerPageChange,
+  footer,
+  showHeader,
 }: {
   headers: TableHeader<T>[];
   data: T[];
@@ -136,6 +142,8 @@ export const TableCard = <T extends {}>({
   rowsPerPage: number;
   totalRows: number;
   onRowsPerPageChange: (value: number) => void;
+  footer?: JSX.Element | Element;
+  showHeader?: boolean;
 }) => {
   const pagesCount = Math.ceil(totalRows / rowsPerPage);
   const handlePerPageCountChange = useCallback(
@@ -154,42 +162,45 @@ export const TableCard = <T extends {}>({
         getRowId={getRowId}
         selectedRowId={selectedRowId}
         RowAction={RowAction}
+        showHeader={showHeader}
       />
-      <Card.Footer>
-        <div className="flex-1 flex items-center justify-between py-2 px-4">
-          <div className="flex flex-1">
-            <p className="text-sm text-gray-700">
-              Showing{" "}
-              <span className="font-medium">
-                {(page - 1) * rowsPerPage + 1}
-              </span>{" "}
-              to{" "}
-              <span className="font-medium">
-                {Math.min(page * rowsPerPage, totalRows)}
-              </span>{" "}
-              of <span className="font-medium">{totalRows}</span> results
-            </p>
+      {footer || (
+        <Card.Footer>
+          <div className="flex-1 flex items-center justify-between flex-wrap px-4 py-2 bg-gray-50">
+            <div className="flex flex-1 flex-shrink-0">
+              <span className="text-sm text-gray-700 flex-shrink-0">
+                Showing{" "}
+                <span className="font-medium">
+                  {(page - 1) * rowsPerPage + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-medium">
+                  {Math.min(page * rowsPerPage, totalRows)}
+                </span>{" "}
+                of <span className="font-medium">{totalRows}</span> results
+              </span>
+            </div>
+            <div className="space-x-4 flex flex-shrink-0 flex-1 justify-end">
+              <InputSelect
+                items={[
+                  { id: "5", label: "5 rows", value: 5 },
+                  { id: "10", label: "10 rows", value: 10 },
+                  { id: "25", label: "25 rows", value: 25 },
+                  { id: "50", label: "50 rows", value: 50 },
+                  { id: "100", label: "100 rows", value: 100 },
+                ]}
+                selected={`${rowsPerPage}`}
+                onChange={({ value }) => handlePerPageCountChange(value)}
+              />
+              <Paginator
+                pagesCount={pagesCount}
+                currentPage={page}
+                onPageChange={onPageChange}
+              />
+            </div>
           </div>
-          <div className="space-x-4 flex">
-            <InputSelect
-              items={[
-                { id: "5", label: "5 rows", value: 5 },
-                { id: "10", label: "10 rows", value: 10 },
-                { id: "25", label: "25 rows", value: 25 },
-                { id: "50", label: "50 rows", value: 50 },
-                { id: "100", label: "100 rows", value: 100 },
-              ]}
-              selected={`${rowsPerPage}`}
-              onChange={({ value }) => handlePerPageCountChange(value)}
-            />
-            <Paginator
-              pagesCount={pagesCount}
-              currentPage={page}
-              onPageChange={onPageChange}
-            />
-          </div>
-        </div>
-      </Card.Footer>
+        </Card.Footer>
+      )}
     </Card>
   );
 };
