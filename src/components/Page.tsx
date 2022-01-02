@@ -3,7 +3,7 @@ import { Breadcrumb, Navigation, NavigationSection } from ".";
 
 interface Props {
   navigation?: boolean;
-  title?: string;
+  title?: string | JSX.Element;
   breadcrumbs?: Breadcrumb[];
   sections?: NavigationSection[];
 }
@@ -15,7 +15,6 @@ export const Page: FunctionComponent<Props> = ({
   breadcrumbs,
   sections,
 }) => {
-  console.log(breadcrumbs);
   return (
     <div className="bg-secondary-600/10 w-screen h-screen flex  overflow-hidden flex-col">
       {navigation && (

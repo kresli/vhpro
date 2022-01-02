@@ -154,7 +154,7 @@ export const TableCard = <T extends {}>({
     [onPageChange, onRowsPerPageChange]
   );
   return (
-    <Card>
+    <Card roundedBottom={false}>
       <Table
         onRowClick={onRowClick}
         headers={headers}

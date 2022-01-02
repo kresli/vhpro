@@ -1,8 +1,6 @@
 import { ExclamationCircleIcon } from "@heroicons/react/outline";
 import {
-  ArrowLeftIcon,
   BeakerIcon,
-  BriefcaseIcon,
   ChartPieIcon,
   CogIcon,
   CollectionIcon,
@@ -192,7 +190,12 @@ export const ProgramPage: FunctionComponent<Props> = ({
   return (
     <Page
       navigation
-      title={`${program?.name} program`}
+      title={
+        <div className="flex flex-col justify-center items-center">
+          {`${program?.name} program`}
+          <div className="text-sm text-gray-400">{program?.description}</div>
+        </div>
+      }
       sections={sections}
       breadcrumbs={breadcrumbs}
     >

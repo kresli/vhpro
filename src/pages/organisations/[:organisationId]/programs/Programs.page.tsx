@@ -1,30 +1,11 @@
 import { CheckIcon, CollectionIcon, SearchIcon } from "@heroicons/react/solid";
-import classNames from "classnames";
-import { FunctionComponent, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
 import { Button, Page, TableCard, TableHeader } from "src/components";
+import { QuestionnaireTag } from "src/components/QuestionnaireTag";
 import { useApi } from "src/contexts";
 import { Program } from "src/types";
-
-const QuestTag: FunctionComponent<{ label: string }> = ({ label }) => {
-  return (
-    <div
-      className={classNames(
-        "inline-flex py-1 px-2 text-sm rounded-full",
-        "h-fit m-1",
-        {
-          "bg-red-300": label === "EQ5D",
-          "bg-cyan-300": label === "FACTG",
-          "bg-violet-300": label === "QLQC30",
-          "bg-lime-300": label === "BN20",
-        }
-      )}
-    >
-      {label}
-    </div>
-  );
-};
 
 export const ProgramsPage = () => {
   const api = useApi();
@@ -71,7 +52,7 @@ export const ProgramsPage = () => {
         RowCell: ({ availableQuestionnaireTypes }) => (
           <div className="flex flex-wrap h-full items-center p-2">
             {availableQuestionnaireTypes.map((label) => (
-              <QuestTag key={label} label={label} />
+              <QuestionnaireTag key={label} label={label} />
             ))}
           </div>
         ),

@@ -17,7 +17,7 @@ export interface NavigationSection {
 }
 interface Props {
   breadcrumbs?: Breadcrumb[];
-  title?: string;
+  title?: string | JSX.Element;
   sections?: NavigationSection[];
 }
 export function Navigation({ breadcrumbs, title, sections }: Props) {

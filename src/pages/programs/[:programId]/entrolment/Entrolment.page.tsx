@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { useHistory, useParams } from "react-router-dom";
+import { Link, NavLink, useHistory, useParams } from "react-router-dom";
 import {
   Button,
   Highlight,
@@ -148,9 +148,9 @@ export const EntrolmentPage = () => {
       <div className="flex flex-1 h-full overflow-hidden px-4 pt-4 flex-col">
         <div className="flex flex-row space-x-4 rounded-t-lg mb-4">
           <div className="p-2 text-secondary-900">
-            <ChevronLeftIcon className="w-6" />
-            {/* <Button onClick={() => {}}>
-            </Button> */}
+            <Link to={`/organisations/${program?.organisation.organisationId}`}>
+              <ChevronLeftIcon className="w-6" />
+            </Link>
           </div>
 
           <div className="flex flex-col flex-1 w-full">
