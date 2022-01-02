@@ -12,7 +12,7 @@ const HeaderColumn = ({
   isLastItem: boolean;
   isFirstItem: boolean;
   width?: number;
-  header: TableHeader;
+  header: TableHeaderProps;
   onResizeStart: () => void;
 }) => {
   const { label, stickyColumn } = header;
@@ -61,7 +61,7 @@ const TableHeader = <T extends {}>({
   onColumnsWidthChange,
   RowAction,
 }: {
-  headers: TableHeader<T>[];
+  headers: TableHeaderProps<T>[];
   columnsWidth: number[];
   onColumnsWidthChange: (columnsWidth: number[]) => void;
   RowAction?: RowAction<T>;
@@ -117,10 +117,12 @@ const Cell = <T extends {}>({
   width,
   stickyColumn,
   RowCell,
+  isEvenRow,
 }: {
   width: number | undefined;
   stickyColumn?: boolean;
   RowCell: (row: T) => JSX.Element;
+  isEvenRow: boolean;
   row: T;
 }) => {
   return (
@@ -137,8 +139,10 @@ const Cell = <T extends {}>({
         "overflow-hidden",
         "flex",
         "flex-1",
+        "group-hover:bg-gray-100",
         {
-          "sticky left-0 z20 bg-white group-hover:bg-gray-100": stickyColumn,
+          "sticky left-0 z20 bg-white": stickyColumn,
+          "bg-gray-50": isEvenRow,
         }
       )}
     >
@@ -157,14 +161,16 @@ const Row = <T extends {}>({
   columnsWidth,
   RowAction,
   rowId,
+  isEvenRow,
 }: {
   row: T;
   rowId: string;
   selectedRowId?: string;
   onRowClick?: (row: T) => void;
-  headers: TableHeader[];
+  headers: TableHeaderProps[];
   columnsWidth: number[];
   RowAction?: RowAction<T>;
+  isEvenRow: boolean;
 }) => {
   const selected = selectedRowId === rowId;
   return (
@@ -195,6 +201,7 @@ const Row = <T extends {}>({
             stickyColumn={stickyColumn}
             RowCell={RowCell}
             row={row}
+            isEvenRow={isEvenRow}
           />
         );
       })}
@@ -207,7 +214,7 @@ const Row = <T extends {}>({
   );
 };
 
-export interface TableHeader<T = any> {
+export interface TableHeaderProps<T = any> {
   label: string;
   stickyColumn?: boolean;
   defaultWidth?: number;
@@ -215,7 +222,7 @@ export interface TableHeader<T = any> {
 }
 
 interface Props<T extends {}> {
-  headers: TableHeader<T>[];
+  headers: TableHeaderProps<T>[];
   data: T[];
   getRowId: (row: T) => string;
   onRowClick?: (row: T) => void;
@@ -249,7 +256,7 @@ export const Table = <T extends {}>({
             />
           )}
           <div className="divide-y divide-black/10 w-auto">
-            {data.map((row) => {
+            {data.map((row, i) => {
               const id = getRowId(row);
               return (
                 <Row
@@ -261,6 +268,7 @@ export const Table = <T extends {}>({
                   columnsWidth={columnsWidth}
                   RowAction={RowAction}
                   onRowClick={onRowClick}
+                  isEvenRow={i % 2 === 0}
                 />
               );
             })}

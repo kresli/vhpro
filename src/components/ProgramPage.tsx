@@ -24,7 +24,7 @@ import {
 } from "src/components";
 import { useApi } from "src/contexts";
 import { Patient, Program } from "src/types";
-import { TableHeader } from "./Table";
+import { TableHeaderProps } from "./Table";
 
 interface Props {
   programId: string;
@@ -137,7 +137,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
         history.push(`/programs/${programId}/participants/${id}`),
     [history, programId]
   );
-  const headers: TableHeader<Patient>[] = useMemo(
+  const headers: TableHeaderProps<Patient>[] = useMemo(
     () => [
       {
         label: "Patient Name",

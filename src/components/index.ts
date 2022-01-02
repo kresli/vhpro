@@ -11,3 +11,4 @@ export * from "./Card";
 export * from "./TableCard";
 export * from "./InputSelect";
 export * from "./Highlight";
+export * from "./DateRangePicker";

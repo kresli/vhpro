@@ -36,6 +36,7 @@ export function Navigation({ breadcrumbs, title, sections }: Props) {
         <div className="flex whitespace-nowrap space-x-8 flex-1">
           {breadcrumbs?.map(({ href, label, Icon }) => (
             <Link
+              key={label}
               to={href}
               className={classNames(
                 "text-gray-400 flex flex-1 items-end",

@@ -2,7 +2,7 @@ import { SearchIcon } from "@heroicons/react/solid";
 import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
-import { Button, Page, TableCard, TableHeader } from "src/components";
+import { Button, Page, TableCard, TableHeaderProps } from "src/components";
 import { useApi } from "src/contexts";
 import { Organisation } from "src/types";
 
@@ -21,7 +21,7 @@ export const OrganisationsPage = () => {
     organisations: [],
     totalCount: 0,
   };
-  const headers: TableHeader<Organisation>[] = useMemo(
+  const headers: TableHeaderProps<Organisation>[] = useMemo(
     () => [
       {
         label: "Organisation name",

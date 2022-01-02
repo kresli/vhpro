@@ -1,7 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 import { useCallback, useMemo } from "react";
-import { TableHeader, Card, Table, InputSelect } from ".";
+import { TableHeaderProps, Card, Table, InputSelect } from ".";
 
 const PagButton = ({
   label,
@@ -131,7 +131,7 @@ export const TableCard = <T extends {}>({
   footer,
   showHeader,
 }: {
-  headers: TableHeader<T>[];
+  headers: TableHeaderProps<T>[];
   data: T[];
   getRowId: (row: T) => string;
   onRowClick?: (row: T) => void;

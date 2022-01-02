@@ -2,7 +2,7 @@ import { CheckIcon, CollectionIcon, SearchIcon } from "@heroicons/react/solid";
 import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
-import { Button, Page, TableCard, TableHeader } from "src/components";
+import { Button, Page, TableCard, TableHeaderProps } from "src/components";
 import { QuestionnaireTag } from "src/components/QuestionnaireTag";
 import { useApi } from "src/contexts";
 import { Program } from "src/types";
@@ -25,7 +25,7 @@ export const ProgramsPage = () => {
   );
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const headers: TableHeader<Program>[] = useMemo(
+  const headers: TableHeaderProps<Program>[] = useMemo(
     () => [
       {
         label: "Project name",
@@ -60,7 +60,7 @@ export const ProgramsPage = () => {
       {
         label: "consented patients",
         RowCell: ({ consentedPatientsCount }) => (
-          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
+          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis flex items-center">
             {consentedPatientsCount}
           </div>
         ),
@@ -69,7 +69,7 @@ export const ProgramsPage = () => {
         label: "created",
         defaultWidth: 150,
         RowCell: ({ dateCreated }) => (
-          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
+          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis flex items-center">
             {dateCreated.toLocaleDateString()}
           </div>
         ),
@@ -78,7 +78,7 @@ export const ProgramsPage = () => {
         label: "updated",
         defaultWidth: 150,
         RowCell: ({ dateUpdated }) => (
-          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
+          <div className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis flex items-center">
             {dateUpdated.toLocaleDateString()}
           </div>
         ),
@@ -87,7 +87,7 @@ export const ProgramsPage = () => {
         label: "end date",
         defaultWidth: 150,
         RowCell: ({ endDate }) => (
-          <div className="px-6 py-4 whitespace-nowrap  overflow-hidden text-ellipsis">
+          <div className="px-6 py-4 whitespace-nowrap  overflow-hidden text-ellipsis flex items-center">
             {endDate?.toLocaleDateString()}
           </div>
         ),
@@ -96,7 +96,7 @@ export const ProgramsPage = () => {
         label: "free text",
         defaultWidth: 120,
         RowCell: ({ disableFreeText }) => (
-          <div className="px-6 py-4 whitespace-nowrap">
+          <div className="px-6 py-4 whitespace-nowrap flex items-center">
             {disableFreeText && <CheckIcon className="w-6 text-green-500" />}
           </div>
         ),
@@ -104,7 +104,9 @@ export const ProgramsPage = () => {
       {
         label: "users",
         RowCell: ({ usersCount }) => (
-          <div className="px-6 py-4 whitespace-nowrap">{usersCount}</div>
+          <div className="px-6 py-4 whitespace-nowrap flex items-center">
+            {usersCount}
+          </div>
         ),
       },
     ],

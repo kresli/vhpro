@@ -7,6 +7,8 @@ import {
 } from "./serializers";
 import { RawEndpointData } from "../types/RawEndpointData";
 import { Tokens } from "src/types";
+import { fetchJson, httpClient } from "./fetchUtils";
+import { stringify } from "query-string";
 
 export class Api {
   private fetch: AxiosInstance;
@@ -19,24 +21,20 @@ export class Api {
   }
   setTokens(tokens: Tokens) {
     this.tokens = tokens;
-    this.fetch = axios.create({
-      baseURL: this.apiEndpoint,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "*/*",
-        "Access-Control-Allow-Origin": "*",
-        Authorization: `Bearer ${tokens.accessToken}`,
-      },
-    });
+    this.fetch = Api.createAxios(this.apiEndpoint, tokens.accessToken);
     this.onTokensUpdate(this.tokens);
   }
   private static createAxios(apiEndpoint: string, accessToken: string | null) {
     return axios.create({
       baseURL: apiEndpoint,
+      withCredentials: true,
       headers: {
-        "Content-Type": "application/json",
-        Accept: "*/*",
+        // "Content-Type": "application/json",
+        // Accept: "*/*",
+        // "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Referrer-Policy": "origin",
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       },
     });
@@ -191,5 +189,70 @@ export class Api {
       RawEndpointData["/admin/projects/:projectId/users/:patientId"]
     >(`admin/projects/${programId}/users/${participantId}`);
     return { payload, data: serializePatient(payload.data) };
+  }
+
+  // async getMedications({
+  //   programId,
+  //   startDate,
+  //   endDate,
+  // }: {
+  //   programId: string;
+  //   startDate: Date;
+  //   endDate: Date;
+  // }) {
+  //   const payload = await fetch.get<
+  //     RawEndpointData["/pro-dashboard/projects/:projectId/reports/medication"]
+  //   >(`/pro-dashboard/${programId}/reports/medication`, {
+  //     params: {
+  //       startDate: startDate.toISOString(),
+  //       endDate: endDate.toISOString(),
+  //     },
+  //   });
+  async getMedications({
+    programId,
+    startDate,
+    endDate,
+  }: {
+    programId: string;
+    startDate: Date;
+    endDate: Date;
+  }) {
+    const queryString = stringify({
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    });
+    return httpClient<{}>(
+      `https://staging.api.vinehealth.ai/api/v1/pro-dashboard/projects/${programId}/reports/medication?${queryString}`,
+      {
+        method: "GET",
+        headers: new Headers({
+          Accept: "application/json",
+        }),
+      },
+      this.tokens?.accessToken
+    );
+    // const x = await httpClient(
+    //   `https://staging.api.vinehealth.ai/api/v1/pro-dashboard/${programId}/reports/medication?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+    //   {},
+    //   this.tokens?.accessToken
+    // );
+    // const payload = await window.fetch(
+    //   `https://staging.api.vinehealth.ai/api/v1/pro-dashboard/${programId}/reports/medication?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+    //   {
+    //     headers: new Headers({
+    //       // "Content-Type": "application/json",
+    //       // Accept: "*/*",
+    //       // "Access-Control-Allow-Origin": "*",
+    //       "Access-Control-Allow-Origin": "*",
+    //       "Content-Type": "application/json",
+    //       "Referrer-Policy": "origin",
+    //       Authorization: `Bearer ${this.tokens?.accessToken}`,
+    //     }),
+    //   }
+    // );
+    // const data = await payload.json();
+    // console.log(data);
+    // return payload;
+    return {};
   }
 }

@@ -5,7 +5,7 @@ import {
   Highlight,
   ProgramPage,
   TableCard,
-  TableHeader,
+  TableHeaderProps,
 } from "src/components";
 import { useApi } from "src/contexts";
 import classNames from "classnames";
@@ -84,7 +84,7 @@ export const EntrolmentPage = () => {
     { keepPreviousData: true }
   );
   const { patients, totalCount } = data || { patients: [], totalCount: 0 };
-  const headers: TableHeader<Patient>[] = useMemo(
+  const headers: TableHeaderProps<Patient>[] = useMemo(
     () => [
       {
         label: "Patient Name",
