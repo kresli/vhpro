@@ -1,24 +1,29 @@
 import { FunctionComponent } from "react";
-import { Navigation } from ".";
+import { Breadcrumb, Navigation, NavigationSection } from ".";
 
 interface Props {
   navigation?: boolean;
   title?: string;
-  backAction?: { href: string; label: string };
-  sections?: { label: string; link: string }[];
+  breadcrumbs?: Breadcrumb[];
+  sections?: NavigationSection[];
 }
 
 export const Page: FunctionComponent<Props> = ({
   navigation,
   children,
   title,
-  backAction,
+  breadcrumbs,
   sections,
 }) => {
+  console.log(breadcrumbs);
   return (
     <div className="bg-secondary-600/10 w-screen h-screen flex  overflow-hidden flex-col">
       {navigation && (
-        <Navigation backAction={backAction} title={title} sections={sections} />
+        <Navigation
+          breadcrumbs={breadcrumbs}
+          title={title}
+          sections={sections}
+        />
       )}
 
       <div className="flex flex-col w-full h-full overflow-hidden">

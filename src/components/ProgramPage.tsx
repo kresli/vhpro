@@ -1,5 +1,18 @@
 import { ExclamationCircleIcon } from "@heroicons/react/outline";
-import { SearchIcon } from "@heroicons/react/solid";
+import {
+  ArrowLeftIcon,
+  BeakerIcon,
+  BriefcaseIcon,
+  ChartPieIcon,
+  CogIcon,
+  CollectionIcon,
+  FlagIcon,
+  OfficeBuildingIcon,
+  SearchIcon,
+  UserGroupIcon,
+  UsersIcon,
+} from "@heroicons/react/solid";
+import classNames from "classnames";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
@@ -21,6 +34,63 @@ interface Props {
   selectedParticipantId?: string;
 }
 
+const Footer = ({
+  page,
+  rowsPerPage,
+  totalCount,
+  setPage,
+  setRowsPerPage,
+}: {
+  page: number;
+  rowsPerPage: number;
+  totalCount: number;
+  setPage: (page: number) => void;
+  setRowsPerPage: (rows: number) => void;
+}) => {
+  const handlePerPageCountChange = useCallback(
+    (value: number) => {
+      setPage(1);
+      setRowsPerPage(value);
+    },
+    [setPage, setRowsPerPage]
+  );
+  return (
+    <Card.Footer>
+      <div className="flex flex-col px-4 py-2 bg-gray-50">
+        <span className="text-sm text-gray-700 flex-shrink-0 mb-2">
+          Showing{" "}
+          <span className="font-medium">{(page - 1) * rowsPerPage + 1}</span> to{" "}
+          <span className="font-medium">
+            {Math.min(page * rowsPerPage, totalCount)}
+          </span>{" "}
+          of <span className="font-medium">{totalCount}</span> results
+        </span>
+        <div className="flex flex-row justify-items-stretch">
+          <InputSelect
+            items={[
+              { id: "5", label: "5 rows", value: 5 },
+              { id: "10", label: "10 rows", value: 10 },
+              { id: "25", label: "25 rows", value: 25 },
+              { id: "50", label: "50 rows", value: 50 },
+              { id: "100", label: "100 rows", value: 100 },
+            ]}
+            selected={`${rowsPerPage}`}
+            onChange={({ value }) => handlePerPageCountChange(value)}
+          />
+          <div className="flex flex-1 justify-end">
+            <Paginator
+              showActivePageOnly
+              pagesCount={Math.ceil(totalCount / rowsPerPage)}
+              currentPage={page}
+              onPageChange={setPage}
+            />
+          </div>
+        </div>
+      </div>
+    </Card.Footer>
+  );
+};
+
 export const ProgramPage: FunctionComponent<Props> = ({
   programId,
   program,
@@ -32,11 +102,19 @@ export const ProgramPage: FunctionComponent<Props> = ({
   const [filterTerm, setFilterTerm] = useState("");
   const sections = useMemo(
     () => [
-      { label: "Patient enrolment", link: `${baseURL}/enrolment` },
-      { label: "Reports", link: `${baseURL}/reports` },
-      { label: "Questionnaires", link: `${baseURL}/questionnaires` },
-      { label: "Team", link: `${baseURL}/team` },
-      { label: "Settings", link: `${baseURL}/settings` },
+      {
+        label: "Patient enrolment",
+        link: `${baseURL}/enrolment`,
+        Icon: FlagIcon,
+      },
+      { label: "Reports", link: `${baseURL}/reports`, Icon: ChartPieIcon },
+      {
+        label: "Questionnaires",
+        link: `${baseURL}/questionnaires`,
+        Icon: BeakerIcon,
+      },
+      { label: "Team", link: `${baseURL}/team`, Icon: UserGroupIcon },
+      { label: "Settings", link: `${baseURL}/settings`, Icon: CogIcon },
     ],
     [baseURL]
   );
@@ -95,29 +173,54 @@ export const ProgramPage: FunctionComponent<Props> = ({
     ],
     [filterTerm, selectedParticipantId]
   );
-  const handlePerPageCountChange = useCallback((value: number) => {
-    setPage(1);
-    setRowsPerPage(value);
-  }, []);
+  const getRowId = useCallback(({ id }) => id, []);
+  const breadcrumbs = useMemo(
+    () => [
+      {
+        Icon: CollectionIcon,
+        href: `/organisaitons`,
+        label: "Organisations",
+      },
+      {
+        Icon: OfficeBuildingIcon,
+        href: `/organisations/${program?.organisation.organisationId}`,
+        label: `${program?.organisation.name} organisation`,
+      },
+    ],
+    [program?.organisation.name, program?.organisation.organisationId]
+  );
   return (
     <Page
       navigation
       title={`${program?.name} program`}
       sections={sections}
-      backAction={{
-        href: `/organisations/${program?.organisation.organisationId}`,
-        label: `${program?.organisation.name} organisation`,
-      }}
+      breadcrumbs={breadcrumbs}
     >
       <div className="flex flex-row flex-1 h-full overflow-hidden">
-        <div className="flex flex-col w-96 border-r border-slate-30 shrink-0 border-secondary-200">
+        <div
+          className={classNames(
+            "flex flex-col w-96 border-r",
+            "border-slate-30 shrink-0 border-secondary-200"
+          )}
+        >
           <div className="flex flex-col overflow-hidden h-full">
-            <div className="h-16 justify-center items-center flex text-secondary-900/40 flex-shrink-0">
+            <div
+              className={classNames(
+                "h-16 justify-center items-center",
+                "flex text-secondary-900/40 flex-shrink-0"
+              )}
+            >
+              <UsersIcon className="w-6 mr-2" />
               PARTICIPANTS
             </div>
             <div className="pb-4 px-4">
               <div className="relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div
+                  className={classNames(
+                    "absolute inset-y-0 left-0 pl-3",
+                    "flex items-center pointer-events-none"
+                  )}
+                >
                   <SearchIcon className="text-gray-500 w-5" />
                 </div>
 
@@ -128,7 +231,11 @@ export const ProgramPage: FunctionComponent<Props> = ({
                     setFilterTerm(currentTarget.value);
                   }}
                   placeholder="search for participant"
-                  className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 pr-12  border-gray-300 rounded-md"
+                  className={classNames(
+                    "focus:ring-primary-500",
+                    "focus:border-primary-500 block w-full pl-10 pr-12",
+                    "border-gray-300 rounded-md"
+                  )}
                 />
               </div>
             </div>
@@ -138,7 +245,7 @@ export const ProgramPage: FunctionComponent<Props> = ({
                 onRowClick={onRowClick}
                 headers={headers}
                 data={patients}
-                getRowId={({ id }) => id}
+                getRowId={getRowId}
                 page={page}
                 onPageChange={setPage}
                 rowsPerPage={rowsPerPage}
@@ -146,45 +253,13 @@ export const ProgramPage: FunctionComponent<Props> = ({
                 totalRows={totalCount}
                 showHeader={false}
                 footer={
-                  <Card.Footer>
-                    <div className="flex flex-col px-4 py-2 bg-gray-50">
-                      <span className="text-sm text-gray-700 flex-shrink-0 mb-2">
-                        Showing{" "}
-                        <span className="font-medium">
-                          {(page - 1) * rowsPerPage + 1}
-                        </span>{" "}
-                        to{" "}
-                        <span className="font-medium">
-                          {Math.min(page * rowsPerPage, totalCount)}
-                        </span>{" "}
-                        of <span className="font-medium">{totalCount}</span>{" "}
-                        results
-                      </span>
-                      <div className="flex flex-row justify-items-stretch">
-                        <InputSelect
-                          items={[
-                            { id: "5", label: "5 rows", value: 5 },
-                            { id: "10", label: "10 rows", value: 10 },
-                            { id: "25", label: "25 rows", value: 25 },
-                            { id: "50", label: "50 rows", value: 50 },
-                            { id: "100", label: "100 rows", value: 100 },
-                          ]}
-                          selected={`${rowsPerPage}`}
-                          onChange={({ value }) =>
-                            handlePerPageCountChange(value)
-                          }
-                        />
-                        <div className="flex flex-1 justify-end">
-                          <Paginator
-                            showActivePageOnly
-                            pagesCount={Math.ceil(totalCount / rowsPerPage)}
-                            currentPage={page}
-                            onPageChange={setPage}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </Card.Footer>
+                  <Footer
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    setPage={setPage}
+                    setRowsPerPage={setRowsPerPage}
+                    totalCount={totalCount}
+                  />
                 }
               />
             </div>

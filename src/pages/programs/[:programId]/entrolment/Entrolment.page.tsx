@@ -10,9 +10,12 @@ import {
 import { useApi } from "src/contexts";
 import classNames from "classnames";
 import {
+  ArrowLeftIcon,
+  ChevronLeftIcon,
   DotsVerticalIcon,
   PaperAirplaneIcon,
   SearchIcon,
+  UserAddIcon,
 } from "@heroicons/react/solid";
 import { useCallback, useMemo, useState } from "react";
 import { Patient } from "src/types";
@@ -35,7 +38,10 @@ const RowAction = ({ consentGiven }: Patient) => (
       {!consentGiven && (
         <button
           onClick={() => {}}
-          className="bg-gray-100 p-2 hover:bg-gray-200 rounded-l-md flex items-center"
+          className={classNames(
+            "bg-gray-100 p-2 hover:bg-gray-200",
+            "rounded-l-md flex items-center"
+          )}
         >
           <PaperAirplaneIcon className="w-4 mr-1" />
           Resend invite
@@ -84,7 +90,12 @@ export const EntrolmentPage = () => {
         label: "Patient Name",
         stickyColumn: true,
         RowCell: ({ firstName, lastName }) => (
-          <div className="px-6 py-4 whitespace-nowrap text-ellipsis overflow-hidden">
+          <div
+            className={classNames(
+              "px-6 py-4 whitespace-nowrap",
+              "text-ellipsis overflow-hidden"
+            )}
+          >
             <Highlight text={`${firstName} ${lastName}`} term={term} />
           </div>
         ),
@@ -112,7 +123,12 @@ export const EntrolmentPage = () => {
         label: "email",
         defaultWidth: 300,
         RowCell: ({ email }) => (
-          <div className="text-gray-500 px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis">
+          <div
+            className={classNames(
+              "text-gray-500 px-6 py-4",
+              "whitespace-nowrap overflow-hidden text-ellipsis"
+            )}
+          >
             <Highlight text={email} term={term} />
           </div>
         ),
@@ -131,6 +147,12 @@ export const EntrolmentPage = () => {
     <ProgramPage programId={programId} program={program}>
       <div className="flex flex-1 h-full overflow-hidden px-4 pt-4 flex-col">
         <div className="flex flex-row space-x-4 rounded-t-lg mb-4">
+          <div className="p-2 text-secondary-900">
+            <ChevronLeftIcon className="w-6" />
+            {/* <Button onClick={() => {}}>
+            </Button> */}
+          </div>
+
           <div className="flex flex-col flex-1 w-full">
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -147,11 +169,10 @@ export const EntrolmentPage = () => {
             </div>
           </div>
           <div>
-            <Button
-              label="INVITE NEW PATIENT"
-              intent="primary"
-              onClick={() => {}}
-            />
+            <Button intent="primary" onClick={() => {}}>
+              <UserAddIcon className="w-6 mr-2" />
+              INVITE NEW PATIENT
+            </Button>
           </div>
         </div>
         <TableCard

@@ -1,4 +1,4 @@
-import { CheckIcon, SearchIcon } from "@heroicons/react/solid";
+import { CheckIcon, CollectionIcon, SearchIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
 import { useQuery } from "react-query";
@@ -135,7 +135,13 @@ export const ProgramsPage = () => {
     <Page
       navigation
       title={`${organisation?.name} organisation`}
-      backAction={{ href: "/organisations", label: "Organisations" }}
+      breadcrumbs={[
+        {
+          href: "/organisations",
+          label: "Organisations",
+          Icon: CollectionIcon,
+        },
+      ]}
       sections={[
         { label: "Programs", link: `${baseURL}/programs` },
         { label: "Settings", link: `${baseURL}/settings` },
