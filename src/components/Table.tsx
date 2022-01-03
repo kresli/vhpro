@@ -142,7 +142,7 @@ const Cell = <T extends {}>({
         "group-hover:bg-gray-100",
         {
           "sticky left-0 z20 bg-white": stickyColumn,
-          "bg-gray-50": isEvenRow,
+          "bg-gray-50": !isEvenRow,
         }
       )}
     >
@@ -245,7 +245,7 @@ export const Table = <T extends {}>({
   );
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="shadow border-b border-gray-200 overflow-scroll flex flex-1">
+      <div className="shadow border-b border-gray-200 overflow-auto flex flex-1">
         <div className="h-fit relative border-b border-black/10 flex-1">
           {showHeader && (
             <TableHeader

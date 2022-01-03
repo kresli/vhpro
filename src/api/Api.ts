@@ -5,7 +5,7 @@ import {
   serializeUser,
 } from "./serializers";
 import { RawEndpointData } from "../types/RawEndpointData";
-import { Tokens } from "src/types";
+import { Medication, Tokens } from "src/types";
 import { stringify } from "query-string";
 
 type Params = Record<string, string | number | boolean>;
@@ -85,12 +85,6 @@ export class Api {
   constructor(private apiEndpoint: string, private tokens: Tokens) {
     this.fetch = new Fetch(this.apiEndpoint, this.tokens.accessToken);
   }
-  // setTokens(tokens: Tokens) {
-  //   this.tokens = tokens;
-  //   console.log(tokens);
-  //   this.fetch = new Fetch(tokens.accessToken);
-  //   this.onTokensUpdate(this.tokens);
-  // }
   get hasAccessToken() {
     return !!this.tokens.accessToken;
   }
@@ -251,20 +245,16 @@ export class Api {
     startDate: Date;
     endDate: Date;
   }) {
-    const queryString = stringify({
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-    });
-    return fetch(
-      `https://staging.api.vinehealth.ai/api/v1/pro-dashboard/projects/${programId}/reports/medication?${queryString}`,
+    const { data } = await this.fetch.get<Medication[]>(
+      `/pro-dashboard/projects/${programId}/reports/medication`,
       {
-        method: "GET",
-        headers: new Headers({
-          Accept: "application/json",
-          Authorization: `Bearer ${this.tokens?.accessToken}`,
-        }),
+        params: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        },
       }
-    ).then((v) => v.json());
+    );
+    return data;
   }
 
   async logout() {

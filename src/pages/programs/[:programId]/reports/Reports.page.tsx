@@ -2,10 +2,16 @@ import classNames from "classnames";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import { Card, DateRangePicker, ProgramPage } from "src/components";
+import {
+  Card,
+  DateRangePicker,
+  ProgramPage,
+  Table,
+  TableCard,
+} from "src/components";
 import { QuestionnaireTag } from "src/components/QuestionnaireTag";
 import { useApi } from "src/contexts";
-import { Program } from "src/types";
+import { Medication, Program } from "src/types";
 
 const ReportCard: FunctionComponent<{ title: string }> = ({
   children,
@@ -71,7 +77,7 @@ export const ReportsPage = () => {
   return (
     <ProgramPage programId={programId} program={program}>
       <div className="overflow-hidden p-4 flex flex-col">
-        <div className="border border-b-gray-300 pb-4">
+        <div className="border-b border-gray-300 pb-4">
           <DateRangePicker range={dateRange} onChange={setDateRange} />
         </div>
         <div
@@ -97,7 +103,37 @@ export const ReportsPage = () => {
               There have been no new temperature logs in the selected time frame
             </div>
           </ReportCard>
-          <ReportCard title="Medication adherence"></ReportCard>
+          <ReportCard title="Medication adherence">
+            <div className="">
+              <Table
+                data={medications || ([] as Medication[])}
+                headers={[
+                  {
+                    label: "Name",
+                    RowCell: ({ medicationName }) => (
+                      <div className="p-4">{medicationName}</div>
+                    ),
+                  },
+                  {
+                    label: "Adherence",
+                    RowCell: ({ adherence }) => (
+                      <div className="p-4">{adherence}%</div>
+                    ),
+                  },
+                  {
+                    label: "Skipped doses",
+                    RowCell: ({ eventsSkipped }) => (
+                      <div className="p-4">{eventsSkipped} doses skipped</div>
+                    ),
+                  },
+                ]}
+                getRowId={({ medicationName }) => medicationName}
+              />
+              <div className="text-sm p-4 text-gray-400">
+                * adherence to all scheduled medications by all patients
+              </div>
+            </div>
+          </ReportCard>
           <ReportCard title="Most logged symptoms"></ReportCard>
           <ReportCard title="Symptoms Trends"></ReportCard>
         </div>
