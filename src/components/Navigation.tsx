@@ -4,6 +4,7 @@ import { BellIcon } from "@heroicons/react/outline";
 import { Link, NavLink } from "react-router-dom";
 import { ComponentProps } from "react";
 import classNames from "classnames";
+import { useAuth } from "src/contexts";
 
 export interface Breadcrumb {
   href: string;
@@ -21,6 +22,7 @@ interface Props {
   sections?: NavigationSection[];
 }
 export function Navigation({ breadcrumbs, title, sections }: Props) {
+  const auth = useAuth();
   return (
     <div
       className={classNames(
@@ -79,6 +81,7 @@ export function Navigation({ breadcrumbs, title, sections }: Props) {
         </div>
       </div>
       <div className="flex flex-row items-start p-4">
+        <button onClick={() => auth.signOut()}> sign out</button>
         <button
           type="button"
           className="bg-gray-800 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"

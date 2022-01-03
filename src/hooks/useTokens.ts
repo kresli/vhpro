@@ -15,6 +15,7 @@ export function useTokens() {
   const [tokens, setTokens] = useState(() => getLocalTokens());
   const { accessToken, refreshToken } = tokens;
   const updateTokens = useCallback((tokens: Tokens) => {
+    setTokens(tokens);
     const { accessToken, refreshToken } = tokens;
     if (accessToken) {
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
@@ -40,5 +41,5 @@ export function useTokens() {
     window.addEventListener("storage", callback);
     return () => window.removeEventListener("storage", callback);
   }, [accessToken, refreshToken]);
-  return { tokens, updateTokens };
+  return [tokens, updateTokens] as const;
 }

@@ -16,24 +16,28 @@ type Respond<T> = Promise<{
 }>;
 
 class Fetch {
-  constructor(private apiEndpoint: string, private accessToken: string | null) {
-    // return fetch(
-    //   `https://staging.api.vinehealth.ai/api/v1/pro-dashboard/projects/${programId}/reports/medication?${queryString}`,
-    //   {
-    //     method: "GET",
-    //     headers: new Headers({
-    //       Accept: "application/json",
-    //       Authorization: `Bearer ${this.tokens?.accessToken}`,
-    //     }),
-    //   }
+  private apiEndpoint: string;
+  constructor(apiEndpoint: string, private accessToken: string | null) {
+    this.apiEndpoint = apiEndpoint.replace(/\/$/, "");
   }
 
-  post<T>(url: string, data?: any) {
-    return Fetch.post<T>(url, data, { token: this.accessToken || "" });
+  private getUrl(endpoint: string) {
+    const value = endpoint[0] === "/" ? endpoint : `/${endpoint}`;
+    return `${this.apiEndpoint}${value}`;
+  }
+
+  post<T>(url: string, data?: any, options?: { token?: string }) {
+    return Fetch.post<T>(this.getUrl(url), data, {
+      token: this.accessToken || "",
+      ...options,
+    });
   }
 
   get<T>(url: string, options?: { params?: Params }) {
-    return Fetch.get<T>(url, { token: this.accessToken || "", ...options });
+    return Fetch.get<T>(this.getUrl(url), {
+      token: this.accessToken || "",
+      ...options,
+    });
   }
 
   static async post<T>(
@@ -78,46 +82,41 @@ class Fetch {
 
 export class Api {
   private fetch: Fetch;
-  private tokens: Tokens | null = null;
-  constructor(
-    private apiEndpoint: string,
-    private onTokensUpdate: (tokens: Tokens) => void
-  ) {
-    this.fetch = new Fetch(apiEndpoint, null);
+  constructor(private apiEndpoint: string, private tokens: Tokens) {
+    this.fetch = new Fetch(this.apiEndpoint, this.tokens.accessToken);
   }
-  setTokens(tokens: Tokens) {
-    this.tokens = tokens;
-    console.log(tokens);
-    this.fetch = new Fetch(this.apiEndpoint, tokens.accessToken);
-    this.onTokensUpdate(this.tokens);
+  // setTokens(tokens: Tokens) {
+  //   this.tokens = tokens;
+  //   console.log(tokens);
+  //   this.fetch = new Fetch(tokens.accessToken);
+  //   this.onTokensUpdate(this.tokens);
+  // }
+  get hasAccessToken() {
+    return !!this.tokens.accessToken;
   }
   async login(creds: { email: string; password: string }) {
-    const payload = await this.fetch.post<RawEndpointData["/auth/login"]>(
-      `${this.apiEndpoint}/auth/login`,
+    const {
+      data: { accessToken, refreshToken, user },
+    } = await this.fetch.post<RawEndpointData["/auth/login"]>(
+      `/auth/login`,
       creds
     );
-    this.tokens = {
-      accessToken: payload.data.accessToken,
-      refreshToken: payload.data.refreshToken,
+    const tokens = {
+      accessToken,
+      refreshToken,
     };
-    this.setTokens(this.tokens);
     return {
-      payload,
-      data: {
-        ...payload,
-        user: serializeUser(payload.data.user),
-      },
+      tokens,
+      user: serializeUser(user),
     };
   }
   async getUser() {
     // Question this should have Application/json
     const payload = await this.fetch.get<RawEndpointData["/current"]>(
-      `${this.apiEndpoint}/current`
+      `/current`
     );
-    console.log(this);
     return {
-      payload,
-      data: serializeUser(payload.data),
+      user: serializeUser(payload.data),
     };
   }
   async getOrganisations({
@@ -189,16 +188,17 @@ export class Api {
     return { payload, data: serializeProgram(payload.data) };
   }
   async refetchAccessToken() {
-    // Question this should have Application/json
-    const payload = await this.fetch.post<RawEndpointData["/auth/refresh"]>(
-      `${this.apiEndpoint}/auth/refresh`
+    const { refreshToken } = this.tokens;
+    if (!refreshToken) return { accessToken: null };
+    const {
+      data: { accessToken },
+    } = await this.fetch.post<RawEndpointData["/auth/refresh"]>(
+      `/auth/refresh`,
+      {},
+      { token: refreshToken }
     );
-    this.setTokens({
-      accessToken: payload.data.accessToken,
-      refreshToken: this.tokens?.refreshToken || null,
-    });
     return {
-      payload,
+      accessToken,
     };
   }
   async getPatients({
@@ -265,5 +265,9 @@ export class Api {
         }),
       }
     ).then((v) => v.json());
+  }
+
+  async logout() {
+    return this.fetch.post("auth/logout");
   }
 }

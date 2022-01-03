@@ -23,6 +23,7 @@ import { ReportsPage } from "./pages/programs/[:programId]/reports/Reports.page"
 import { TeamPage } from "./pages/programs/[:programId]/team/Team.page";
 import { EntrolmentPage } from "./pages/programs/[:programId]/entrolment/Entrolment.page";
 import { SettingsPage } from "./pages/programs/[:programId]/settings/Settings.page";
+import { useTokens } from "./hooks";
 
 const env = new Env({
   apiEndpoint: "https://staging.api.vinehealth.ai/api/v1",
@@ -78,11 +79,15 @@ const Routes = memo(() => {
 const queryClient = new QueryClient();
 
 export const App = memo(() => {
-  const apiContext = useApiContext(env);
-  const authContext = useAuthContext(apiContext);
-  const { isSigned } = authContext;
-  const { hasToken } = apiContext;
-  if (hasToken && !isSigned) return <div>loading</div>;
+  const tokens = useTokens();
+  const apiContext = useApiContext(env, tokens);
+  const authContext = useAuthContext(apiContext, tokens);
+
+  // ========
+
+  const { loading } = authContext;
+  if (loading) return <div>loading</div>;
+  console.log("loading", loading);
   return (
     <AuthContext.Provider value={authContext}>
       <ApiContext.Provider value={apiContext}>

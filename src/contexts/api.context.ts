@@ -1,40 +1,23 @@
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { Api } from "src/api";
 import { Env } from "src/env";
 import { useTokens } from "src/hooks";
-import jwtDecode from "jwt-decode";
 
-const expOffset = 1000 * 60;
-
-export const useApiContext = (env: Env) => {
-  const { tokens, updateTokens } = useTokens();
-  const api = useMemo(
-    () => new Api(env.apiEndpoint, updateTokens),
-    [env.apiEndpoint, updateTokens]
+export const useApiContext = (
+  env: Env,
+  [tokens]: ReturnType<typeof useTokens>
+) =>
+  useMemo(
+    () =>
+      new Api(env.apiEndpoint, {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      }),
+    [env.apiEndpoint, tokens.accessToken, tokens.refreshToken]
   );
-  useEffect(() => {
-    api.setTokens(tokens);
-    const { accessToken } = tokens;
-    if (!accessToken) return;
-    const { exp } = jwtDecode<{ exp: number }>(accessToken);
-    const expireTime = exp * 1000 - expOffset;
-    const currTime = new Date().getTime();
-    if (expireTime < currTime) {
-      api.refetchAccessToken();
-      return;
-    }
-    const regTimeout = setTimeout(
-      () => api.refetchAccessToken(),
-      expireTime - currTime
-    );
-    return () => clearTimeout(regTimeout);
-  }, [api, tokens]);
-  const hasToken = !!tokens.accessToken;
-  return { api, hasToken };
-};
 
 export type UseApiContext = ReturnType<typeof useApiContext>;
 
 export const ApiContext = createContext<UseApiContext>(null as any);
 
-export const useApi = () => useContext(ApiContext).api;
+export const useApi = () => useContext(ApiContext);
