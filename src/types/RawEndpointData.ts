@@ -1,4 +1,4 @@
-import { Medication, PatientRaw } from ".";
+import { Medication, PatientRaw, Symptom } from ".";
 import { OrganisationRaw } from "./Organisation.raw";
 import { ProgramRaw } from "./Program.raw";
 import { UserRaw } from "./User.raw";
@@ -21,5 +21,6 @@ export type RawEndpointData = {
     accessToken: string;
     userId: string;
   };
-  ["/pro-dashboard/projects/:projectId/reports/medication"]: Medication;
+  ["/pro-dashboard/projects/:projectId/reports/medication"]: Medication[];
+  ["/pro-dashboard/projects/:projectId/reports/symptoms"]: Symptom[];
 };

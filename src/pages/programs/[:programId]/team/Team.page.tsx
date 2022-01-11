@@ -1,25 +1,12 @@
-import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
 import { ProgramPage } from "src/components";
-import { useApi } from "src/contexts";
+import { useGetProgram } from "src/hooks";
 
 export const TeamPage = () => {
-  const api = useApi();
   const { programId } = useParams<{ programId: string }>();
-  const { data: program } = useQuery(
-    [programId],
-    async () => (await api.getProgram(programId)).data
-  );
-  const { data: participants } = useQuery(
-    [programId, "patients"],
-    async () => (await api.getPatients({ programId })).data
-  );
+  const { program } = useGetProgram({ programId });
   return (
-    <ProgramPage
-      programId={programId}
-      program={program}
-      participants={participants || []}
-    >
+    <ProgramPage programId={programId} program={program}>
       team
     </ProgramPage>
   );

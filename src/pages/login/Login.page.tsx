@@ -1,4 +1,4 @@
-import { Menu, Transition } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 import {
   Fragment,
   FunctionComponent,
@@ -8,11 +8,8 @@ import {
 } from "react";
 import { Button, FieldText, Page } from "src/components";
 import { UseForm, useForm, useMount } from "src/hooks";
-import { ChevronDownIcon } from "@heroicons/react/solid";
-import { Api } from "src/api";
 import logo from "src/components/logo.svg";
-import { useApi, useAuth } from "src/contexts";
-import { useQuery } from "react-query";
+import { useAuth } from "src/contexts";
 
 const Animate: FunctionComponent = ({ children }) => (
   <Transition

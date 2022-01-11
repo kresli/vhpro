@@ -1,17 +1,11 @@
 import classNames from "classnames";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
-import { useQuery } from "react-query";
 import { useParams } from "react-router-dom";
-import {
-  Card,
-  DateRangePicker,
-  ProgramPage,
-  Table,
-  TableCard,
-} from "src/components";
+import { Card, DateRangePicker, ProgramPage, Table } from "src/components";
 import { QuestionnaireTag } from "src/components/QuestionnaireTag";
-import { useApi } from "src/contexts";
-import { Medication, Program } from "src/types";
+import { useGetMedications, useGetProgram } from "src/hooks";
+import { useGetSymptoms } from "src/hooks/useGetSymptoms";
+import { Program } from "src/types";
 
 const ReportCard: FunctionComponent<{ title: string }> = ({
   children,
@@ -49,12 +43,8 @@ function useProgramLoaded(program: Program | undefined, callback: () => void) {
 }
 
 export const ReportsPage = () => {
-  const api = useApi();
   const { programId } = useParams<{ programId: string }>();
-  const { data: program } = useQuery(
-    [programId],
-    async () => (await api.getProgram(programId)).data
-  );
+  const { program } = useGetProgram({ programId });
   const [dateRange, setDateRange] = useState([
     program?.startDate,
     program?.endDate || new Date(),
@@ -62,18 +52,16 @@ export const ReportsPage = () => {
   useProgramLoaded(program, () =>
     setDateRange([program?.startDate, program?.endDate || new Date()])
   );
-  const { data: medications } = useQuery(
-    [programId, dateRange[0]?.valueOf(), dateRange[1]?.valueOf()],
-    async () => {
-      if (!dateRange[0] || !dateRange[1]) return;
-      return api.getMedications({
-        programId,
-        startDate: dateRange[0],
-        endDate: dateRange[1],
-      });
-    }
-  );
-  console.log(medications);
+  const { medications } = useGetMedications({
+    programId,
+    rangeStartDate: dateRange[0],
+    rangeEndDate: dateRange[1],
+  });
+  const { symptoms } = useGetSymptoms({
+    programId,
+    rangeEndDate: dateRange[0],
+    rangeStartDate: dateRange[1],
+  });
   return (
     <ProgramPage programId={programId} program={program}>
       <div className="overflow-hidden p-4 flex flex-col">
@@ -104,37 +92,75 @@ export const ReportsPage = () => {
             </div>
           </ReportCard>
           <ReportCard title="Medication adherence">
-            <div className="">
-              <Table
-                data={medications || ([] as Medication[])}
-                headers={[
-                  {
-                    label: "Name",
-                    RowCell: ({ medicationName }) => (
-                      <div className="p-4">{medicationName}</div>
-                    ),
-                  },
-                  {
-                    label: "Adherence",
-                    RowCell: ({ adherence }) => (
-                      <div className="p-4">{adherence}%</div>
-                    ),
-                  },
-                  {
-                    label: "Skipped doses",
-                    RowCell: ({ eventsSkipped }) => (
-                      <div className="p-4">{eventsSkipped} doses skipped</div>
-                    ),
-                  },
-                ]}
-                getRowId={({ medicationName }) => medicationName}
-              />
-              <div className="text-sm p-4 text-gray-400">
-                * adherence to all scheduled medications by all patients
-              </div>
+            <Table
+              data={medications || []}
+              headers={[
+                {
+                  label: "Name",
+                  RowCell: ({ medicationName }) => (
+                    <div className="p-4">{medicationName}</div>
+                  ),
+                },
+                {
+                  label: "Adherence",
+                  RowCell: ({ adherence }) => (
+                    <div className="p-4">{adherence}%</div>
+                  ),
+                },
+                {
+                  label: "Skipped doses",
+                  RowCell: ({ eventsSkipped }) => (
+                    <div className="p-4">{eventsSkipped} doses skipped</div>
+                  ),
+                },
+              ]}
+              getRowId={({ medicationName }) => medicationName}
+            />
+            <div className="text-sm p-4 text-gray-400">
+              * adherence to all scheduled medications by all patients
             </div>
           </ReportCard>
-          <ReportCard title="Most logged symptoms"></ReportCard>
+          <ReportCard title="Most logged symptoms">
+            <Table
+              data={symptoms}
+              headers={[
+                {
+                  label: "symptom",
+                  RowCell: ({ logType }) => (
+                    <div className="p-4">{logType.name}</div>
+                  ),
+                },
+                {
+                  label: "Logs",
+                  RowCell: ({ count }) => <div>{count}</div>,
+                },
+                {
+                  label: "Grade 0",
+                  RowCell: ({ grades }) => <div>{grades["0"].count}</div>,
+                },
+                {
+                  label: "Grade 1",
+                  RowCell: ({ grades }) => <div>{grades["1"].count}</div>,
+                },
+                {
+                  label: "Grade 2",
+                  RowCell: ({ grades }) => <div>{grades["2"].count}</div>,
+                },
+                {
+                  label: "Grade 3",
+                  RowCell: ({ grades }) => <div>{grades["3"]?.count}</div>,
+                },
+                {
+                  label: "Grade 4",
+                  RowCell: ({ grades }) => <div>{grades["4"]?.count}</div>,
+                },
+              ]}
+              getRowId={(d) => {
+                console.log(d);
+                return d.logType.identifier;
+              }}
+            />
+          </ReportCard>
           <ReportCard title="Symptoms Trends"></ReportCard>
         </div>
       </div>

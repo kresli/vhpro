@@ -1,5 +1,4 @@
-import { useQuery } from "react-query";
-import { Link, NavLink, useHistory, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 import {
   Button,
   Highlight,
@@ -7,10 +6,8 @@ import {
   TableCard,
   TableHeaderProps,
 } from "src/components";
-import { useApi } from "src/contexts";
 import classNames from "classnames";
 import {
-  ArrowLeftIcon,
   ChevronLeftIcon,
   DotsVerticalIcon,
   PaperAirplaneIcon,
@@ -19,6 +16,7 @@ import {
 } from "@heroicons/react/solid";
 import { useCallback, useMemo, useState } from "react";
 import { Patient } from "src/types";
+import { useGetPatients, useGetProgram } from "src/hooks";
 
 enum STATUSES {
   CONSENT_GIVEN = "Consented",
@@ -63,27 +61,15 @@ const RowAction = ({ consentGiven }: Patient) => (
 
 export const EntrolmentPage = () => {
   const { programId } = useParams<{ programId: string }>();
-  const api = useApi();
   const history = useHistory();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [term, setTerm] = useState("");
-  const { data: program } = useQuery(
-    [programId],
-    async () => (await api.getProgram(programId)).data
-  );
-  const { data } = useQuery(
-    [programId, "patients", page, rowsPerPage, term],
-    () =>
-      api.getPatients({
-        programId,
-        perPage: rowsPerPage,
-        page,
-        term,
-      }),
+  const { program } = useGetProgram({ programId });
+  const { patients, totalCount } = useGetPatients(
+    { programId, perPage: rowsPerPage, term, page },
     { keepPreviousData: true }
   );
-  const { patients, totalCount } = data || { patients: [], totalCount: 0 };
   const headers: TableHeaderProps<Patient>[] = useMemo(
     () => [
       {

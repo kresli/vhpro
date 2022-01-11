@@ -1,30 +1,26 @@
 import { CheckIcon, CollectionIcon, SearchIcon } from "@heroicons/react/solid";
 import { useCallback, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import { useHistory, useParams } from "react-router-dom";
 import { Button, Page, TableCard, TableHeaderProps } from "src/components";
 import { QuestionnaireTag } from "src/components/QuestionnaireTag";
-import { useApi } from "src/contexts";
+import { useGetOrganisation } from "src/hooks";
+import { useGetPrograms } from "src/hooks/useGetPrograms";
 import { Program } from "src/types";
 
 export const ProgramsPage = () => {
-  const api = useApi();
   const { organisationId } = useParams<{ organisationId: string }>();
-  const { data: organisation } = useQuery(
-    ["organisation", organisationId],
-    async () => (await api.getOrganisation(organisationId)).data
-  );
+  const { organisation } = useGetOrganisation({ organisationId });
+  const { programs, totalCount } = useGetPrograms({ organisationId });
   const baseURL = `/organisations/${organisationId}`;
   const history = useHistory();
-  const { data } = useQuery(["programs", organisationId], () =>
-    api.getPrograms({ organisationId })
-  );
   const onRowClick = useCallback(
     ({ projectId }: Program) => history.push(`/programs/${projectId}`),
     [history]
   );
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const getRowId = useCallback(({ projectId }) => projectId, []);
+
   const headers: TableHeaderProps<Program>[] = useMemo(
     () => [
       {
@@ -112,8 +108,6 @@ export const ProgramsPage = () => {
     ],
     []
   );
-  const { totalCount, programs } = data || { programs: [], totalCount: 0 };
-  const getRowId = useCallback(({ projectId }) => projectId, []);
   return (
     <Page
       navigation

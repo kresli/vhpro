@@ -1,26 +1,21 @@
 import { SearchIcon } from "@heroicons/react/solid";
 import { useCallback, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
 import { Button, Page, TableCard, TableHeaderProps } from "src/components";
-import { useApi } from "src/contexts";
+import { useGetOrganisations } from "src/hooks";
 import { Organisation } from "src/types";
 
 export const OrganisationsPage = () => {
-  const api = useApi();
   const history = useHistory();
   const [tableState, setTableState] = useState({
     rowsPerPage: 25,
     page: 1,
   });
   const { page, rowsPerPage } = tableState;
-  const { data } = useQuery([page, rowsPerPage], () =>
-    api.getOrganisations({ page, perPage: rowsPerPage })
-  );
-  const { organisations, totalCount } = data || {
-    organisations: [],
-    totalCount: 0,
-  };
+  const { organisations, totalCount } = useGetOrganisations({
+    page,
+    perPage: rowsPerPage,
+  });
   const headers: TableHeaderProps<Organisation>[] = useMemo(
     () => [
       {

@@ -5,7 +5,7 @@ import {
   serializeUser,
 } from "./serializers";
 import { RawEndpointData } from "../types/RawEndpointData";
-import { Medication, Tokens } from "src/types";
+import { Medication, Symptom, Tokens } from "src/types";
 import { stringify } from "query-string";
 
 type Params = Record<string, string | number | boolean>;
@@ -245,15 +245,34 @@ export class Api {
     startDate: Date;
     endDate: Date;
   }) {
-    const { data } = await this.fetch.get<Medication[]>(
-      `/pro-dashboard/projects/${programId}/reports/medication`,
-      {
-        params: {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-        },
-      }
-    );
+    const { data } = await this.fetch.get<
+      RawEndpointData["/pro-dashboard/projects/:projectId/reports/medication"]
+    >(`/pro-dashboard/projects/${programId}/reports/medication`, {
+      params: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
+    });
+    return data;
+  }
+
+  async getSymptomps({
+    programId,
+    startDate,
+    endDate,
+  }: {
+    programId: string;
+    startDate: Date;
+    endDate: Date;
+  }) {
+    const { data } = await this.fetch.get<
+      RawEndpointData["/pro-dashboard/projects/:projectId/reports/symptoms"]
+    >(`/pro-dashboard/projects/${programId}/reports/symptoms`, {
+      params: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
+    });
     return data;
   }
 

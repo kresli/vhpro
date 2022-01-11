@@ -12,7 +12,6 @@ import {
 } from "@heroicons/react/solid";
 import classNames from "classnames";
 import { FunctionComponent, useCallback, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import { useHistory } from "react-router-dom";
 import {
   Card,
@@ -22,7 +21,7 @@ import {
   Paginator,
   TableCard,
 } from "src/components";
-import { useApi } from "src/contexts";
+import { useGetPatients } from "src/hooks";
 import { Patient, Program } from "src/types";
 import { TableHeaderProps } from "./Table";
 
@@ -116,21 +115,12 @@ export const ProgramPage: FunctionComponent<Props> = ({
     ],
     [baseURL]
   );
-  const api = useApi();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
-  const { data } = useQuery(
-    [programId, "patients", page, rowsPerPage, filterTerm],
-    () =>
-      api.getPatients({
-        programId,
-        perPage: rowsPerPage,
-        page,
-        term: filterTerm,
-      }),
+  const { patients, totalCount } = useGetPatients(
+    { programId, perPage: rowsPerPage, term: filterTerm, page },
     { keepPreviousData: true }
   );
-  const { patients, totalCount } = data || { patients: [], totalCount: 0 };
   const onRowClick = useCallback(
     () =>
       ({ id }: Patient) =>

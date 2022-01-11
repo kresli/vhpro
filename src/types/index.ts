@@ -7,3 +7,4 @@ export * from "./Program";
 export * from "./Patient.raw";
 export * from "./Patient";
 export * from "./Medication";
+export * from "./Symptom";
