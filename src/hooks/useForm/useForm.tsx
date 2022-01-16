@@ -1,68 +1,118 @@
-import { useMemo, useState } from "react";
-
-interface FieldConfig<T = any> {
-  label?: string;
-  defaultValue: T;
-}
-
-interface UseFormConfig {
-  [key: string]: FieldConfig;
-}
-
-type Values<T extends UseFormConfig> = {
-  [K in keyof T]: T[K]["defaultValue"];
-};
-
-export type FormField<T extends FieldConfig> = {
-  config: T;
-  value: T["defaultValue"];
-  setValue: (value: T["defaultValue"]) => void;
-};
-
-type Fields<T extends UseFormConfig> = {
-  [K in keyof T]: FormField<T[K]>;
-};
+import { useMemo, useRef, useState } from "react";
 
 const { fromEntries, entries } = Object;
 
-export type UseForm<T extends UseFormConfig> = {
-  values: Values<T>;
-  fields: Fields<T>;
+type FieldConfig<O = any, I = any, FV = any> = {
+  defaultValue: O;
+  validators?: ((value: O, form: FV) => string | false | undefined)[];
 };
 
-export function useForm<T extends UseFormConfig>(config: T): UseForm<T> {
-  const defaultValues: Values<T> = useMemo(
-    () =>
-      fromEntries(
-        entries(config).map(([key, { defaultValue }]) => [key, defaultValue])
-      ) as Values<T>,
-    [config]
-  );
-  const [overrideValues, setOverrideValues] = useState<Partial<Values<T>>>({});
-  const values: Values<T> = useMemo(
-    () =>
-      fromEntries(
-        entries(defaultValues).map(([key, defaultValues]) => [
-          key,
-          overrideValues[key] || defaultValues,
-        ])
-      ) as Values<T>,
-    [defaultValues, overrideValues]
-  );
-  const fields: Fields<T> = useMemo(
-    () =>
-      fromEntries(
-        entries(config).map(([key, fieldConfig]) => [
-          key,
-          {
-            value: values[key],
-            setValue: (value: any) =>
-              setOverrideValues({ ...values, [key]: value }),
-            config: fieldConfig,
+type FormSchema = Record<string, ReturnType<typeof createField>>;
+type ExtractValues<T extends FormSchema> = { [K in keyof T]: T[K]["out"] };
+type FormConfig<T extends FormSchema> = {
+  [K in keyof T]: FieldConfig<T[K]["in"], T[K]["out"], ExtractValues<T>>;
+};
+
+type Fields<T extends FormSchema, C extends FormConfig<T>> = {
+  [K in keyof T]: {
+    value: T[K]["out"];
+    schema: T[K];
+    config: C[K];
+    errorMessage: string | undefined;
+    hasError: boolean;
+    setValue: (value: T[K]["out"]) => void;
+    reset: () => void;
+  };
+};
+
+export function useForm<S extends FormSchema, C extends FormConfig<S>>(
+  schema: S,
+  config: C
+) {
+  const [fields, setFields] = useState<Fields<S, C>>(() => {
+    const generatedFields = fromEntries(
+      entries(schema).map(([key, schema]) => [
+        key,
+        {
+          value: config[key].defaultValue,
+          schema,
+          config: config[key],
+          reset: () => {
+            setFields({
+              ...fieldsRef.current,
+              [key]: config[key].defaultValue,
+            });
           },
-        ])
-      ) as Fields<T>,
-    [config, values]
+          setValue: (value: any) => {
+            const updatedFields: Fields<S, C> = {
+              ...fromEntries(
+                entries(fieldsRef.current).map(([fieldKey, field]) => {
+                  const fieldValue = fieldKey === key ? value : field.value;
+                  const values = {
+                    ...valuesRef.current,
+                    [fieldKey]: fieldValue,
+                  } as ExtractValues<S>;
+                  valuesRef.current = values;
+                  const errorMessage = config[fieldKey].validators
+                    ?.map((validator) => validator(fieldValue, values))
+                    .filter((m) => !!m)[0];
+                  const hasError = !!errorMessage;
+                  return [
+                    fieldKey,
+                    {
+                      ...field,
+                      value: fieldValue,
+                      errorMessage,
+                      hasError,
+                    },
+                  ];
+                })
+              ),
+            } as Fields<S, C>;
+            setFields(updatedFields);
+          },
+        },
+      ])
+    ) as Fields<S, C>;
+    // get values for first init
+    const values = fromEntries(
+      entries(generatedFields).map(([key, field]) => {
+        return [key, field.value];
+      })
+    );
+    // get errors for first init
+    entries(generatedFields).forEach(([key, field]) => {
+      const errorMessage = field.config.validators
+        ?.map((validator: any) => validator(field.value, values))
+        .filter((m: any) => !!m)[0];
+      const hasError = !!errorMessage;
+      Object.assign(field, {
+        errorMessage,
+        hasError,
+      });
+    });
+    return generatedFields;
+  });
+  const fieldsRef = useRef(fields);
+  fieldsRef.current = fields;
+  const hasError = useMemo(
+    () => entries(fields).some(([_, field]) => field.hasError),
+    [fields]
   );
-  return { values, fields };
+  const values = useMemo(
+    () =>
+      fromEntries(
+        entries(fields).map(([key, field]) => {
+          return [key, field.value];
+        })
+      ),
+    [fields]
+  );
+  const valuesRef = useRef(values);
+  valuesRef.current = values;
+  return { fields, hasError, values };
+}
+
+export function createField<Output, Input = Output>() {
+  return null as unknown as { in: Input; out: Output };
 }
