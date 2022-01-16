@@ -1,4 +1,5 @@
 import { renderHook, act } from "@testing-library/react-hooks";
+import { useState } from "react";
 import { createField, useForm } from "./useForm/useForm";
 
 test("setFieldValue", () => {
@@ -404,215 +405,245 @@ test("don't generate new field objects if doesn't need to", () => {
   expect(result.current.fields.label).toBe(label);
 });
 
-// test("set single field shouldn't intact other", () => {
-//   const { result } = renderHook(() =>
-//     useForm({
-//       label: createField<string>(),
-//       title: createField<string>(),
-//     })
-//   );
-//   act(() => {
-//     result.current.fields.title.setValue("modified");
-//   });
-//   act(() => {
-//     result.current.fields.label.setValue("modified");
-//   });
-//   expect(result.current.fields.title.value).toBe("modified");
-//   expect(result.current.fields.label.value).toBe("modified");
-// });
+test("set single field shouldn't intact other", () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string | undefined>(),
+        title: createField<string | undefined>(),
+      },
+      {
+        label: {
+          defaultValue: undefined,
+        },
+        title: {
+          defaultValue: undefined,
+        },
+      }
+    )
+  );
+  act(() => {
+    result.current.fields.title.setValue("modified");
+  });
+  act(() => {
+    result.current.fields.label.setValue("modified");
+  });
+  expect(result.current.fields.title.value).toBe("modified");
+  expect(result.current.fields.label.value).toBe("modified");
+});
 
-// test("set single field shouldn't intact other - Date", () => {
-//   const { result } = renderHook(() =>
-//     useForm(
-//       {
-//         label: createField<string>(),
-//         title: createField<Date>(),
-//       },
-//       {
-//         label: { validators: [(value) => !value] },
-//         title: { validators: [(value) => !value] },
-//       }
-//     )
-//   );
-//   act(() => {
-//     result.current.fields.label.setValue("modified");
-//   });
-//   act(() => {
-//     result.current.fields.title.setValue(new Date("2021-08-17T23:13:35.988Z"));
-//   });
-//   expect(result.current.fields.label.value).toBe("modified");
-//   expect(result.current.fields.title.value?.toISOString()).toBe(
-//     "2021-08-17T23:13:35.988Z"
-//   );
-// });
+test("set single field shouldn't intact other - Date", () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string | undefined>(),
+        title: createField<Date | undefined>(),
+      },
+      {
+        label: { defaultValue: undefined, validators: [(value) => !value] },
+        title: { defaultValue: undefined, validators: [(value) => !value] },
+      }
+    )
+  );
+  act(() => {
+    result.current.fields.label.setValue("modified");
+  });
+  act(() => {
+    result.current.fields.title.setValue(new Date("2021-08-17T23:13:35.988Z"));
+  });
+  expect(result.current.fields.label.value).toBe("modified");
+  expect(result.current.fields.title.value?.toISOString()).toBe(
+    "2021-08-17T23:13:35.988Z"
+  );
+});
 
-// test("errors shows when value reverts", () => {
-//   const { result } = renderHook(() =>
-//     useForm(
-//       {
-//         label: createField<string>(),
-//       },
-//       {
-//         label: { validators: [(value) => !value] },
-//       }
-//     )
-//   );
-//   act(() => {
-//     result.current.fields.label.setValue("modified");
-//   });
-//   expect(result.current.fields.label.hasError).toBe(false);
-//   act(() => {
-//     result.current.fields.label.setValue("");
-//   });
-//   expect(result.current.fields.label.hasError).toBe(true);
-// });
+test("errors shows when value reverts", () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string | undefined>(),
+      },
+      {
+        label: { defaultValue: undefined, validators: [(value) => !value] },
+      }
+    )
+  );
+  act(() => {
+    result.current.fields.label.setValue("modified");
+  });
+  expect(result.current.fields.label.hasError).toBe(false);
+  act(() => {
+    result.current.fields.label.setValue("");
+  });
+  expect(result.current.fields.label.hasError).toBe(true);
+});
 
-// test("hasChanged", () => {
-//   const { result } = renderHook(() =>
-//     useForm(
-//       {
-//         label: createField<string>(),
-//       },
-//       {
-//         label: { defaultValue: "" },
-//       }
-//     )
-//   );
-//   expect(result.current.isModified).toEqual(false);
-//   act(() => {
-//     result.current.fields.label.setValue("change");
-//   });
-//   expect(result.current.isModified).toEqual(true);
-//   act(() => {
-//     result.current.fields.label.setValue("");
-//   });
-//   expect(result.current.isModified).toEqual(false);
-// });
+test("hasChanged", () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string>(),
+      },
+      {
+        label: { defaultValue: "" },
+      }
+    )
+  );
+  expect(result.current.isModified).toEqual(false);
+  act(() => {
+    result.current.fields.label.setValue("change");
+  });
+  expect(result.current.isModified).toEqual(true);
+  act(() => {
+    result.current.fields.label.setValue("");
+  });
+  expect(result.current.isModified).toEqual(false);
+});
 
-// test("default values can be changed", () => {
-//   const useWrapper = () => {
-//     const [defaultValue, setDefaultValue] = useState("first");
-//     const form = useForm(
-//       {
-//         label: createField<string>(),
-//       },
-//       {
-//         label: { defaultValue },
-//       }
-//     );
-//     return { form, setDefaultValue };
-//   };
-//   const { result } = renderHook(() => useWrapper());
-//   expect(result.current.form.fields.label.value).toEqual("first");
-//   act(() => {
-//     result.current.form.fields.label.setValue("modified");
-//   });
-//   expect(result.current.form.fields.label.value).toEqual("modified");
-//   act(() => {
-//     result.current.form.reset();
-//   });
-//   expect(result.current.form.fields.label.value).toEqual("first");
-//   act(() => {
-//     result.current.setDefaultValue("second");
-//   });
-//   expect(result.current.form.fields.label.value).toEqual("second");
-//   act(() => {
-//     result.current.form.fields.label.setValue("modified");
-//   });
-//   expect(result.current.form.fields.label.value).toEqual("modified");
-//   act(() => {
-//     result.current.form.reset();
-//   });
-//   expect(result.current.form.fields.label.value).toEqual("second");
-// });
+test("default values can be changed", () => {
+  const useWrapper = () => {
+    const [defaultValue, setDefaultValue] = useState("first");
+    const form = useForm(
+      {
+        label: createField<string>(),
+      },
+      {
+        label: { defaultValue },
+      }
+    );
+    return { form, setDefaultValue };
+  };
+  const { result } = renderHook(() => useWrapper());
+  expect(result.current.form.fields.label.value).toEqual("first");
+  act(() => {
+    result.current.form.fields.label.setValue("modified");
+  });
+  expect(result.current.form.fields.label.value).toEqual("modified");
+  act(() => {
+    result.current.form.reset();
+  });
+  expect(result.current.form.fields.label.value).toEqual("first");
+  act(() => {
+    result.current.setDefaultValue("second");
+  });
+  expect(result.current.form.fields.label.value).toEqual("second");
+  act(() => {
+    result.current.form.fields.label.setValue("modified");
+  });
+  expect(result.current.form.fields.label.value).toEqual("modified");
+  act(() => {
+    result.current.form.reset();
+  });
+  expect(result.current.form.fields.label.value).toEqual("second");
+});
 
-// test("onSubmit", async () => {
-//   const { result } = renderHook(() =>
-//     useForm(
-//       { label: createField<string>() },
-//       { label: { defaultValue: "my label" } }
-//     )
-//   );
-//   const onSubmit = jest.fn();
-//   const submit = result.current.onSubmit(onSubmit);
-//   await act(() => submit());
-//   expect(onSubmit).toHaveBeenCalledWith({ label: "my label" });
-// });
+test("onSubmit", async () => {
+  const { result } = renderHook(() =>
+    useForm(
+      { label: createField<string>() },
+      { label: { defaultValue: "my label" } }
+    )
+  );
+  const onSubmit = jest.fn();
+  const submit = result.current.onSubmit(onSubmit);
+  await act(() => submit());
+  expect(onSubmit).toHaveBeenCalledWith({ label: "my label" });
+});
 
-// test("setFormValues", () => {
-//   const { result } = renderHook(() =>
-//     useForm({
-//       label: createField<string>(),
-//       age: createField<number>(),
-//       foo: createField<string>(),
-//     })
-//   );
-//   act(() => {
-//     result.current.setFormValues({ label: "my label", age: 23 });
-//   });
-//   expect(result.current.values).toEqual({
-//     label: "my label",
-//     age: 23,
-//   });
-// });
+test("setFormValues", () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string | undefined>(),
+        age: createField<number | undefined>(),
+        foo: createField<string | undefined>(),
+      },
+      {
+        label: {
+          defaultValue: undefined,
+        },
+        age: {
+          defaultValue: undefined,
+        },
+        foo: {
+          defaultValue: undefined,
+        },
+      }
+    )
+  );
+  act(() => {
+    result.current.setFormValues({ label: "my label", age: 23 });
+  });
+  expect(result.current.values).toEqual({
+    label: "my label",
+    age: 23,
+  });
+});
 
-// test("multiselect has correct value", () => {
-//   const { result } = renderHook(() =>
-//     useForm(
-//       {
-//         outcomes: FormFieldType.MULTI_SELECT,
-//       },
-//       {
-//         outcomes: {
-//           options: [
-//             { id: "a", title: "A" },
-//             { id: "b", title: "B" },
-//           ],
-//           defaultValue: ["a"],
-//         },
-//       }
-//     )
-//   );
-//   expect(result.current.fields.outcomes.value).toEqual(["a"]);
-// });
+test("multiselect has correct value", () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        outcomes: createField<string[]>(),
+      },
+      {
+        outcomes: {
+          options: [
+            { id: "a", title: "A" },
+            { id: "b", title: "B" },
+          ],
+          defaultValue: ["a"],
+        },
+      }
+    )
+  );
+  expect(result.current.fields.outcomes.value).toEqual(["a"]);
+});
 
-// test("able to pass promise to onSubmit and wait", async () => {
-//   const { result } = renderHook(() =>
-//     useForm({
-//       outcomes: createField<string>(),
-//     })
-//   );
-//   let resolve: (value?: any) => void;
-//   const submit = result.current.onSubmit(
-//     () => new Promise((_resolve) => (resolve = _resolve))
-//   );
-//   expect(result.current.isLoading).toBe(false);
-//   const submitFinish = act(() => submit());
-//   expect(result.current.isLoading).toBe(true);
-//   act(() => {
-//     resolve();
-//   });
-//   await submitFinish;
-//   expect(result.current.isLoading).toBe(false);
-// });
+test("able to pass promise to onSubmit and wait", async () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        outcomes: createField<string | undefined>(),
+      },
+      {
+        outcomes: {
+          defaultValue: undefined,
+        },
+      }
+    )
+  );
+  let resolve: (value?: any) => void;
+  const submit = result.current.onSubmit(
+    () => new Promise((_resolve) => (resolve = _resolve))
+  );
+  expect(result.current.isLoading).toBe(false);
+  const submitFinish = act(() => submit());
+  expect(result.current.isLoading).toBe(true);
+  act(() => {
+    resolve();
+  });
+  await submitFinish;
+  expect(result.current.isLoading).toBe(false);
+});
 
-// test("onPatchSubmit submits only modified values", async () => {
-//   const { result } = renderHook(() =>
-//     useForm(
-//       {
-//         label: createField<string>(),
-//         age: createField<number>(),
-//       },
-//       {
-//         label: { defaultValue: "my label" },
-//         age: { defaultValue: 2 },
-//       }
-//     )
-//   );
-//   const onSubmit = jest.fn(() => Promise.resolve());
-//   await act(() => result.current.onPatchSubmit(onSubmit)());
-//   expect(onSubmit).lastCalledWith({});
-//   act(() => result.current.fields.label.setValue("new value"));
-//   await act(() => result.current.onPatchSubmit(onSubmit)());
-//   expect(onSubmit).lastCalledWith({ label: "new value" });
-// });
+test("onPatchSubmit submits only modified values", async () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string>(),
+        age: createField<number>(),
+      },
+      {
+        label: { defaultValue: "my label" },
+        age: { defaultValue: 2 },
+      }
+    )
+  );
+  const onSubmit = jest.fn(() => Promise.resolve());
+  await act(() => result.current.onPatchSubmit(onSubmit)());
+  expect(onSubmit).lastCalledWith({});
+  act(() => result.current.fields.label.setValue("new value"));
+  await act(() => result.current.onPatchSubmit(onSubmit)());
+  expect(onSubmit).lastCalledWith({ label: "new value" });
+});

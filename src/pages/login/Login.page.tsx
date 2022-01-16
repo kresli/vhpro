@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { Button, FieldText, Page } from "src/components";
-import { UseForm, useForm, useMount } from "src/hooks";
+import { createField, UseForm, useForm, useMount } from "src/hooks";
 import logo from "src/components/logo.svg";
 import { useAuth } from "src/contexts";
 
@@ -25,12 +25,12 @@ const Animate: FunctionComponent = ({ children }) => (
   </Transition>
 );
 
-const SubmitButton = <T extends UseForm<any>>({
+const SubmitButton = <T extends { values: any }>({
   form,
   onSubmit,
   label = "Submit",
 }: {
-  onSubmit: (values: T["values"]) => Promise<any> | void;
+  onSubmit: (values: any) => Promise<any> | void;
   form: T;
   label?: string;
 }) => {
@@ -54,21 +54,22 @@ const SubmitButton = <T extends UseForm<any>>({
 export const LoginPage = () => {
   const { signIn } = useAuth();
   const form = useForm(
-    useMemo(
-      () => ({
-        email: {
-          type: "email",
-          label: "Email",
-          defaultValue: "",
-        },
-        password: {
-          type: "password",
-          label: "Password",
-          defaultValue: "",
-        },
-      }),
-      []
-    )
+    {
+      email: createField<string>(),
+      password: createField<string>(),
+    },
+    {
+      email: {
+        type: "email",
+        label: "Email",
+        defaultValue: "",
+      },
+      password: {
+        type: "password",
+        label: "Password",
+        defaultValue: "",
+      },
+    }
   );
 
   const handleLogin = useCallback(() => {}, []);

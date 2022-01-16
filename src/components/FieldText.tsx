@@ -1,12 +1,17 @@
-import { FormField } from "src/hooks";
 import { SearchIcon } from "@heroicons/react/solid";
+import { HTMLInputTypeAttribute } from "react";
+
 interface FieldProps {
-  field: FormField<{
-    defaultValue: string;
+  field: {
+    config: {
+      label: string;
+      type: HTMLInputTypeAttribute;
+      placeholder?: string;
+    };
+    value: string;
+    setValue: (value: string) => void;
     label?: string;
-    type: string;
-    placeholder?: string;
-  }>;
+  };
 }
 
 export const FieldText = ({ field }: FieldProps) => {
