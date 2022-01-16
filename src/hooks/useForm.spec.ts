@@ -317,86 +317,92 @@ test("default FormField.DATE = undefined", () => {
   expect(result.current.values.foo).toBeUndefined();
 });
 
-// test("fieldVlidator accept array", () => {
-//   const required = (value?: string) => {
-//     return !value && "label required";
-//   };
-//   const minLength = (value?: string) =>
-//     value && value.length < 3 && "label must be at least 3 characters long";
-//   const { result } = renderHook(() =>
-//     useForm(
-//       {
-//         label: createField<string | undefined>(),
-//       },
-//       {
-//         label: {
-//           defaultValue: undefined,
-//           validators: [required, minLength],
-//         },
-//       }
-//     )
-//   );
-//   expect(result.current.fields.label.errorMessage).toEqual("label required");
-//   act(() => {
-//     result.current.fields.label.setValue("no");
-//   });
-//   expect(result.current.fields.label.errorMessage).toEqual(
-//     "label must be at least 3 characters long"
-//   );
-//   act(() => {
-//     result.current.fields.label.setValue("yes");
-//   });
-//   expect(result.current.fields.label.errorMessage).toBeUndefined();
-// });
+test("fieldVlidator accept array", () => {
+  const required = (value?: string) => {
+    return !value && "label required";
+  };
+  const minLength = (value?: string) =>
+    value && value.length < 3 && "label must be at least 3 characters long";
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string | undefined>(),
+      },
+      {
+        label: {
+          defaultValue: undefined,
+          validators: [required, minLength],
+        },
+      }
+    )
+  );
+  expect(result.current.fields.label.errorMessage).toEqual("label required");
+  act(() => {
+    result.current.fields.label.setValue("no");
+  });
+  expect(result.current.fields.label.errorMessage).toEqual(
+    "label must be at least 3 characters long"
+  );
+  act(() => {
+    result.current.fields.label.setValue("yes");
+  });
+  expect(result.current.fields.label.errorMessage).toBeUndefined();
+});
 
-// test("cancel form will reset to defaults", () => {
-//   const required = (value?: string) => !value && "label required";
-//   const { result } = renderHook(() =>
-//     useForm(
-//       {
-//         label: createField<string | undefined>(),
-//       },
-//       {
-//         label: {
-//           defaultValue: undefined,
-//           validators: [required],
-//         },
-//       }
-//     )
-//   );
-//   expect(result.current.fields.label.errorMessage).toEqual("label required");
-//   act(() => {
-//     result.current.fields.label.setValue("hello");
-//   });
-//   expect(result.current.hasError).toBe(false);
-//   expect(result.current.fields.label.errorMessage).toBeUndefined();
-//   act(() => {
-//     result.current.reset();
-//   });
-//   expect(result.current.fields.label.errorMessage).toEqual("label required");
-//   expect(result.current.fields.label.value).toEqual(undefined);
-// });
+test("cancel form will reset to defaults", () => {
+  const required = (value?: string) => !value && "label required";
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string | undefined>(),
+      },
+      {
+        label: {
+          defaultValue: undefined,
+          validators: [required],
+        },
+      }
+    )
+  );
+  expect(result.current.fields.label.errorMessage).toEqual("label required");
+  act(() => {
+    result.current.fields.label.setValue("hello");
+  });
+  expect(result.current.hasError).toBe(false);
+  expect(result.current.fields.label.errorMessage).toBeUndefined();
+  act(() => {
+    result.current.reset();
+  });
+  expect(result.current.fields.label.errorMessage).toEqual("label required");
+  expect(result.current.fields.label.value).toEqual(undefined);
+});
 
-// test("don't generate new field objects if doesn't need to", () => {
-//   const { result } = renderHook(() =>
-//     useForm({
-//       label: createField<string>(),
-//       title: createField<string>(),
-//     })
-//   );
+test("don't generate new field objects if doesn't need to", () => {
+  const { result } = renderHook(() =>
+    useForm(
+      {
+        label: createField<string | undefined>(),
+        title: createField<string | undefined>(),
+      },
+      {
+        title: { defaultValue: undefined },
+        label: { defaultValue: undefined },
+      }
+    )
+  );
 
-//   const title = result.current.fields.title;
-//   // first time it will modify all the fields because "formTouched" will change
-//   act(() => {
-//     result.current.fields.title.setValue("first");
-//   });
-//   const label = result.current.fields.label;
-//   act(() => {
-//     result.current.fields.title.setValue("second");
-//   });
-//   expect(result.current.fields.title).not.toBe(title);
-//   expect(result.current.fields.label).toBe(label);
-// });
+  const title = result.current.fields.title;
+  // first time it will modify all the fields because "formTouched" will change
+  act(() => {
+    result.current.fields.title.setValue("first");
+  });
+  const label = result.current.fields.label;
+  act(() => {
+    result.current.fields.title.setValue("second");
+  });
+  expect(result.current.fields.title).not.toBe(title);
+  expect(result.current.fields.label).toBe(label);
+});
 
 // test("set single field shouldn't intact other", () => {
 //   const { result } = renderHook(() =>

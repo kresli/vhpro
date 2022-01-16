@@ -1,10 +1,12 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
-const { fromEntries, entries } = Object;
+const { fromEntries, keys } = Object;
+
+type Validator<O, FV> = (value: O, form: FV) => string | false | undefined;
 
 type FieldConfig<O = any, I = any, FV = any> = {
   defaultValue: O;
-  validators?: ((value: O, form: FV) => string | false | undefined)[];
+  validators?: Validator<O, FV>[];
 };
 
 type FormSchema = Record<string, ReturnType<typeof createField>>;
@@ -25,92 +27,70 @@ type Fields<T extends FormSchema, C extends FormConfig<T>> = {
   };
 };
 
+function findFirstError<V, SV>(
+  value: V,
+  values: SV,
+  validators?: Validator<V, SV>[]
+) {
+  if (!validators) return;
+  for (const validator of validators) {
+    const message = validator(value, values);
+    if (!!message) return message;
+  }
+}
+
 export function useForm<S extends FormSchema, C extends FormConfig<S>>(
   schema: S,
   config: C
 ) {
-  const [fields, setFields] = useState<Fields<S, C>>(() => {
-    const generatedFields = fromEntries(
-      entries(schema).map(([key, schema]) => [
-        key,
-        {
-          value: config[key].defaultValue,
-          schema,
-          config: config[key],
-          reset: () => {
-            setFields({
-              ...fieldsRef.current,
-              [key]: config[key].defaultValue,
-            });
-          },
-          setValue: (value: any) => {
-            const updatedFields: Fields<S, C> = {
-              ...fromEntries(
-                entries(fieldsRef.current).map(([fieldKey, field]) => {
-                  const fieldValue = fieldKey === key ? value : field.value;
-                  const values = {
-                    ...valuesRef.current,
-                    [fieldKey]: fieldValue,
-                  } as ExtractValues<S>;
-                  valuesRef.current = values;
-                  const errorMessage = config[fieldKey].validators
-                    ?.map((validator) => validator(fieldValue, values))
-                    .filter((m) => !!m)[0];
-                  const hasError = !!errorMessage;
-                  return [
-                    fieldKey,
-                    {
-                      ...field,
-                      value: fieldValue,
-                      errorMessage,
-                      hasError,
-                    },
-                  ];
-                })
-              ),
-            } as Fields<S, C>;
-            setFields(updatedFields);
-          },
-        },
-      ])
-    ) as Fields<S, C>;
-    // get values for first init
-    const values = fromEntries(
-      entries(generatedFields).map(([key, field]) => {
-        return [key, field.value];
-      })
-    );
-    // get errors for first init
-    entries(generatedFields).forEach(([key, field]) => {
-      const errorMessage = field.config.validators
-        ?.map((validator: any) => validator(field.value, values))
-        .filter((m: any) => !!m)[0];
-      const hasError = !!errorMessage;
-      Object.assign(field, {
-        errorMessage,
-        hasError,
-      });
-    });
-    return generatedFields;
-  });
-  const fieldsRef = useRef(fields);
-  fieldsRef.current = fields;
-  const hasError = useMemo(
-    () => entries(fields).some(([_, field]) => field.hasError),
-    [fields]
-  );
-  const values = useMemo(
+  const schemaRef = useRef(schema);
+  const [defaultValues] = useState(
     () =>
       fromEntries(
-        entries(fields).map(([key, field]) => {
-          return [key, field.value];
-        })
-      ),
-    [fields]
+        keys(schemaRef.current).map((key) => [key, config[key].defaultValue])
+      ) as ExtractValues<S>
   );
-  const valuesRef = useRef(values);
-  valuesRef.current = values;
-  return { fields, hasError, values };
+  const [overrides, setOverrides] = useState({});
+  const values: ExtractValues<S> = useMemo(
+    () => ({ ...defaultValues, ...overrides }),
+    [defaultValues, overrides]
+  );
+  const errorMessages = useMemo(
+    () =>
+      fromEntries(
+        keys(schema).map((key) => [
+          key,
+          findFirstError(values[key], values, config[key].validators),
+        ])
+      ),
+    [config, schema, values]
+  );
+  const hasError = useMemo(
+    () => Object.values(errorMessages).some((msg) => !!msg),
+    [errorMessages]
+  );
+  const fields = useMemo<Fields<S, C>>(
+    () =>
+      fromEntries(
+        keys(schemaRef.current).map((key) => [
+          key,
+          {
+            config: config[key],
+            value: values[key],
+            errorMessage: errorMessages[key],
+            hasError: !!errorMessages[key],
+            setValue: (value: any) => {
+              setOverrides({ ...overrides, [key]: value });
+            },
+          },
+        ])
+      ) as Fields<S, C>,
+    [config, errorMessages, overrides, values]
+  );
+  const reset = useCallback(() => {
+    setOverrides({});
+  }, []);
+  return { fields, values, hasError, reset };
 }
 
 export function createField<Output, Input = Output>() {
